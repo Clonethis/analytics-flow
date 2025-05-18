@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import main_image from '@/public/data_main_photo.jpeg'
+import friendly_image from '@/public/friendly_analytics.jpeg'
 import { BarChart3, PieChart, TrendingUp, Database, Shield, Zap, CheckCircle, ArrowRight, Menu } from "lucide-react"
 import { ToggleMenu, ToggleMenuItems } from "@/components/toggle-menu"
 export default function LandingPage() {
@@ -256,7 +257,7 @@ export default function LandingPage() {
                 <ul className="grid gap-2">
                   {[
                     "Certifikovaní datoví analytici",
-                    "Specialisté na strojové učení",
+                    // "Specialisté na strojové učení",
                     "Experti na vizualizaci dat",
                     "Konzultanti s oborovými znalostmi",
                     "Vývojáři datových řešení",
@@ -276,7 +277,7 @@ export default function LandingPage() {
               <div className="flex items-center justify-center">
                 <div className="relative w-full overflow-hidden rounded-xl border shadow-xl">
                   <Image
-                    src="/placeholder.svg?height=600&width=800&text=Náš+tým+v+akci"
+                    src={friendly_image}
                     alt="Náš tým datových specialistů"
                     width={800}
                     height={600}

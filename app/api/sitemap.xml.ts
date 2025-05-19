@@ -5,10 +5,10 @@ import { writeFileSync } from 'fs';
 import path from 'path';
 
 // Set your website URL here
-const WEBSITE_URL = 'https://analyticsflow.cz';
+const WEBSITE_URL = 'https://yourdomain.com';
 
 // Function to generate sitemap entries from your pages
-const generateSitemap = async () => {
+const generateSitemap = async (): Promise<SitemapEntry[]> => {
   // Get all .js|.tsx|.ts files inside the pages directory, excluding API routes, _app, _document, etc.
   const pages = await globby([
     'pages/**/*.{js,ts,jsx,tsx}',
@@ -17,7 +17,7 @@ const generateSitemap = async () => {
     '!pages/**/[*',  // Exclude dynamic routes for now (we'll handle them separately)
   ]);
 
-  // Add any dynamic routes or additional URLs here
+//   // Add any dynamic routes or additional URLs here
 //   const dynamicRoutes = [
 //     // Example: '/blog/article-1',
 //     // Example: '/products/product-123',
@@ -52,11 +52,20 @@ const generateSitemap = async () => {
 //   });
 
   // Combine all entries
-//   return [...staticPagesEntries, ...dynamicRoutesEntries];
+  return [...staticPagesEntries];
+    // ...dynamicRoutesEntries];
 };
 
+// Define the sitemap entry interface
+interface SitemapEntry {
+  url: string;
+  lastModified: string;
+  changefreq: string;
+  priority: string;
+}
+
 // Generate sitemap XML content
-const generateSitemapXml = (entries) => {
+const generateSitemapXml = (entries: SitemapEntry[]) => {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${entries

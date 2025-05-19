@@ -30,10 +30,10 @@ export default function LandingPage() {
             <Link href="#reference" className="text-sm font-medium hover:text-primary">
               Reference
             </Link>
-            <Link href="#cenik" className="text-sm font-medium hover:text-primary">
+            <Link href="/cenik" className="text-sm font-medium hover:text-primary">
               Ceník
             </Link>
-            <Link href="#kontakt" className="text-sm font-medium hover:text-primary">
+            <Link href="/kontakt" className="text-sm font-medium hover:text-primary">
               Kontakt
             </Link>
           </nav>
@@ -270,7 +270,7 @@ export default function LandingPage() {
                 </ul>
                 <div>
                   <Button asChild>
-                    <Link href="#tym">Poznejte náš tým</Link>
+                    <Link href="/team">Poznejte náš tým</Link>
                   </Button>
                 </div>
               </div>

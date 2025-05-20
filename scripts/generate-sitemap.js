@@ -122,7 +122,11 @@ async function generateSitemap() {
   });
   
   // Combine all entries and remove duplicates
-  const allEntries = [...staticPagesEntries, ...dynamicRoutesEntries, ...additionalRoutesEntries];
+  const allEntries = [
+    ...staticPagesEntries
+    // ...dynamicRoutesEntries,
+    //  ...additionalRoutesEntries
+    ];
   const uniqueEntries = Array.from(new Map(allEntries.map(entry => [entry.url, entry])).values());
   
   // Sort entries by URL for consistency

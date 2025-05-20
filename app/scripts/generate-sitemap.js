@@ -15,7 +15,7 @@ async function generateSitemap() {
     '!pages/**/[*',
   ]);
 
-  const WEBSITE_URL = 'https://yourdomain.com';
+  const WEBSITE_URL = 'https://analyticsflow.cz';
   
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

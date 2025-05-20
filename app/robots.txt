@@ -22,7 +22,3 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://www.analyticsflow.cz/sitemap.xml
-
-# Crawl delay (in seconds) for some bots
-User-agent: *
-Crawl-delay: 1

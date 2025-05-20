@@ -105,7 +105,7 @@ export default function LandingPage() {
         </section>
 
         {/* Trusted By Section */}
-        <section className="w-full py-12 md:py-16 lg:py-20 bg-muted/50">
+        {/* <section className="w-full py-12 md:py-16 lg:py-20 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -126,7 +126,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Services Section */}
         <section id="sluzby" className="w-full py-12 md:py-24 lg:py-32">
@@ -421,11 +421,11 @@ export default function LandingPage() {
                   key={index}
                   className={`flex flex-col rounded-lg border p-6 shadow-sm ${plan.popular ? "border-primary ring-1 ring-primary" : ""}`}
                 >
-                  {plan.popular && (
+                  {/* {plan.popular && (
                     <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
                       Nejoblíbenější
                     </div>
-                  )}
+                  )} */}
                   <div className="space-y-2">
                     <h3 className="text-2xl font-bold">{plan.name}</h3>
                     <div className="flex items-baseline gap-1">

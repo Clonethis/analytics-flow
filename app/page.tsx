@@ -30,6 +30,9 @@ export default function LandingPage() {
             <Link href="#reference" className="text-sm font-medium hover:text-primary">
               Reference
             </Link>
+            <Link href="/o-nas" className="text-sm font-medium hover:text-primary">
+              O nás
+            </Link>
             <Link href="/cenik" className="text-sm font-medium hover:text-primary">
               Ceník
             </Link>
@@ -523,13 +526,13 @@ export default function LandingPage() {
             <span className="text-lg font-bold">DataFlow</span>
           </div>
           <nav className="flex gap-4 sm:gap-6">
-            <Link href="#" className="text-xs hover:underline underline-offset-4">
+            <Link href="/podminky" className="text-xs hover:underline underline-offset-4">
               Podmínky
             </Link>
-            <Link href="#" className="text-xs hover:underline underline-offset-4">
+            <Link href="/ochrana-soukromi" className="text-xs hover:underline underline-offset-4">
               Ochrana soukromí
             </Link>
-            <Link href="#" className="text-xs hover:underline underline-offset-4">
+            <Link href="/cookies" className="text-xs hover:underline underline-offset-4">
               Cookies
             </Link>
           </nav>

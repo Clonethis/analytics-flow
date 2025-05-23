@@ -8,8 +8,9 @@ import { BarChart3, PieChart, TrendingUp, Database, Shield, Zap, CheckCircle, Ar
 import { ToggleMenu, ToggleMenuItems } from "@/components/toggle-menu"
 export default function LandingPage() {
   const menuItems: ToggleMenuItems[] = [
-    { link: '/cenik', linkText: 'Ceník' },
     { link: '/o-nas', linkText: 'O nás' },
+    { link: '/blog', linkText: 'Blog' },
+    { link: '/cenik', linkText: 'Ceník' },
     { link: '/kontakt', linkText: 'Kontakt' },
   ];
   return (
@@ -32,6 +33,9 @@ export default function LandingPage() {
             </Link>
             <Link href="/o-nas" className="text-sm font-medium hover:text-primary">
               O nás
+            </Link>
+            <Link href="/blog" className="text-sm font-medium hover:text-primary">
+              Blog
             </Link>
             <Link href="/cenik" className="text-sm font-medium hover:text-primary">
               Ceník

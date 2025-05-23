@@ -1,8 +1,9 @@
 // pages/api/sitemap.xml.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { globby } from 'globby';
-import { writeFileSync } from 'fs';
+import fs from 'fs'; // Added import
 import path from 'path';
+import matter from 'gray-matter'; // Added import
 
 // Set your website URL here
 const WEBSITE_URL = 'https://www.analyticsflow.cz';
@@ -25,6 +26,10 @@ const generateSitemap = async (): Promise<SitemapEntry[]> => {
     { url: `${WEBSITE_URL}/ochrana-soukromi`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
     { url: `${WEBSITE_URL}/cookies`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
     { url: `${WEBSITE_URL}/kontakt`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
+    // The main /blog page will be picked by globby if it's app/blog/page.tsx
+    // If its priority/changefreq needs to be different, it can be added here and excluded from globby,
+    // or its entry can be found in staticPagesEntries and modified.
+    // For now, assuming globby handles /blog correctly with default priority 0.8.
   ];
 
   // Generate sitemap entries for pages found by globby
@@ -39,7 +44,7 @@ const generateSitemap = async (): Promise<SitemapEntry[]> => {
       // Ensure route starts with a slash or is empty (for homepage)
       const finalRoute = route === '' ? '/' : `/${route}`;
 
-      // Avoid duplicating manually added entries
+      // Avoid duplicating manually added entries if they are already in manualEntries
       if (manualEntries.some(entry => entry.url === `${WEBSITE_URL}${finalRoute}`)) {
         return null;
       }
@@ -47,14 +52,62 @@ const generateSitemap = async (): Promise<SitemapEntry[]> => {
       return {
         url: `${WEBSITE_URL}${finalRoute}`,
         lastModified: new Date().toISOString(),
-        changefreq: 'weekly', // Default for other pages
-        priority: '0.8', // Default for other pages
+        // For /blog page, if picked by globby, default priority will be 0.8 and changefreq weekly.
+        // This can be adjusted if needed by finding it in the array or adding it manually.
+        changefreq: finalRoute === '/blog' ? 'weekly' : 'weekly', // Example: specific for /blog
+        priority: finalRoute === '/blog' ? '0.7' : '0.8',         // Example: specific for /blog
       };
     })
-    .filter(Boolean) as SitemapEntry[]; // Filter out nulls and assert type
+    .filter(Boolean) as SitemapEntry[]; // Filter out nulls (skipped posts)
 
-  // Combine all entries
-  return [...manualEntries, ...staticPagesEntries];
+  // Add individual blog post URLs
+  const postsDirectory = path.join(process.cwd(), 'data/blog');
+  let blogPostFilenames: string[] = [];
+  try {
+    blogPostFilenames = fs.readdirSync(postsDirectory).filter(name => name.endsWith('.md'));
+  } catch (error) {
+    console.warn("Could not read blog posts directory for sitemap:", error);
+    // Continue without blog posts if directory is not found
+  }
+
+  const blogPostEntries = blogPostFilenames.map(filename => {
+    const slug = filename.replace(/\.md$/, '');
+    const filePath = path.join(postsDirectory, filename);
+    let postDate = new Date().toISOString(); // Default to now if no date found
+    try {
+      const fileContents = fs.readFileSync(filePath, 'utf8');
+      const { data } = matter(fileContents); // Only need frontmatter for date
+      if (data.date) {
+        postDate = new Date(data.date).toISOString();
+      }
+    } catch (e) {
+      console.warn(`Could not read frontmatter for sitemap date: ${filename}`, e);
+    }
+
+    return {
+      url: `${WEBSITE_URL}/blog/${slug}`,
+      lastModified: postDate,
+      changefreq: 'monthly',
+      priority: '0.6',
+    } as SitemapEntry;
+  });
+  
+  // Combine all entries. Use a Map to ensure URL uniqueness, preferring manual/static entries if conflicts.
+  const allEntriesMap = new Map<string, SitemapEntry>();
+
+  manualEntries.forEach(entry => allEntriesMap.set(entry.url, entry));
+  staticPagesEntries.forEach(entry => {
+    if (!allEntriesMap.has(entry.url)) { // Avoid overwriting manual entries
+      allEntriesMap.set(entry.url, entry);
+    }
+  });
+  blogPostEntries.forEach(entry => {
+    if (!allEntriesMap.has(entry.url)) { // Avoid overwriting manual or static (e.g. /blog itself)
+      allEntriesMap.set(entry.url, entry);
+    }
+  });
+
+  return Array.from(allEntriesMap.values());
 };
 
 // Define the sitemap entry interface

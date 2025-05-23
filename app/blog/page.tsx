@@ -82,16 +82,36 @@ export default async function BlogPage({ searchParams }: { searchParams?: { sort
   const posts = await getAllBlogPosts(sortBy, sortOrder, categoryFilter);
 
   // Function to build query string for links, preserving existing sort/order if any
-  const buildQueryString = (newParams: { category?: string; sort?: string; order?: string }): string => {
+  const buildQueryString = (newParams: { category?: string | null; sort?: string; order?: string }): string => {
     const currentParams = new URLSearchParams();
-    if (newParams.category !== undefined) currentParams.set('category', newParams.category);
-    else if (categoryFilter) currentParams.set('category', categoryFilter); // Preserve current category if not explicitly changing
 
-    if (newParams.sort !== undefined) currentParams.set('sort', newParams.sort);
-    else if (sortBy) currentParams.set('sort', sortBy); // Preserve current sort
+    // Handle Category
+    // If 'category' is explicitly provided in newParams:
+    // - If it's a non-empty string, set it.
+    // - If it's undefined, null, or empty string, it means we want to remove/omit the category param.
+    // If 'category' is NOT in newParams, preserve the existing categoryFilter (if any).
+    if (newParams.hasOwnProperty('category')) {
+      if (newParams.category) { // Check if truthy (non-empty string)
+        currentParams.set('category', newParams.category);
+      }
+      // If newParams.category is undefined, null, or '', the category param is effectively removed.
+    } else if (categoryFilter) {
+      currentParams.set('category', categoryFilter);
+    }
 
-    if (newParams.order !== undefined) currentParams.set('order', newParams.order);
-    else if (sortOrder) currentParams.set('order', sortOrder); // Preserve current order
+    // Handle Sort
+    if (newParams.hasOwnProperty('sort')) {
+        if (newParams.sort) currentParams.set('sort', newParams.sort);
+    } else if (sortBy) {
+      currentParams.set('sort', sortBy);
+    }
+
+    // Handle Order
+    if (newParams.hasOwnProperty('order')) {
+        if (newParams.order) currentParams.set('order', newParams.order);
+    } else if (sortOrder) {
+      currentParams.set('order', sortOrder);
+    }
     
     return currentParams.toString();
   };
@@ -99,32 +119,32 @@ export default async function BlogPage({ searchParams }: { searchParams?: { sort
 
   if (posts.length === 0 && categoryFilter) { // Special message if filtering yields no results
     return (
-      <main className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 text-center">Náš Blog</h1>
+      <main className="container mx-auto px-4 py-8 md:py-12"> {/* Adjusted py */}
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Náš Blog</h1> {/* Adjusted text size */}
         {/* Sorting controls remain visible */}
-        <div className="mb-8 flex flex-wrap justify-center sm:justify-end gap-x-4 gap-y-2">
-          <span className="font-semibold text-muted-foreground self-center">Řadit podle:</span>
-          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'desc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'date' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-6"> {/* Adjusted margin, items-center, justify-center */}
+          <span className="font-semibold text-muted-foreground mr-2">Řadit podle:</span>
+          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'desc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'date' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
             Datum (nejnovější)
           </Link>
-          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'asc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'date' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'asc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'date' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
             Datum (nejstarší)
           </Link>
-          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'asc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'title' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'asc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'title' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
             Název (A-Z)
           </Link>
-          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'desc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'title' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'desc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'title' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
             Název (Z-A)
           </Link>
         </div>
          {/* Category filter controls remain visible */}
-        <div className="mb-10 flex flex-wrap justify-center gap-x-3 gap-y-2 items-center">
-          <span className="font-semibold text-muted-foreground">Filtrovat podle kategorie:</span>
-          <Link href={`/blog?${buildQueryString({ category: undefined }) }`} className={`text-sm px-3 py-1 rounded-md transition-colors ${!categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-10"> {/* Adjusted gap */}
+          <span className="font-semibold text-muted-foreground mr-2">Filtrovat podle kategorie:</span>
+          <Link href={`/blog?${buildQueryString({ category: undefined }) }`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
             Všechny
           </Link>
           {allCategories.map(category => (
-            <Link key={category} href={`/blog?${buildQueryString({ category: category }) }`} className={`text-sm px-3 py-1 rounded-md transition-colors ${categoryFilter === category ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
+            <Link key={category} href={`/blog?${buildQueryString({ category: category }) }`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${categoryFilter === category ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
               {category}
             </Link>
           ))}
@@ -134,80 +154,83 @@ export default async function BlogPage({ searchParams }: { searchParams?: { sort
     );
   } else if (posts.length === 0) {
     return (
-      <main className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 text-center">Náš Blog</h1>
+      <main className="container mx-auto px-4 py-8 md:py-12"> {/* Adjusted py */}
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Náš Blog</h1> {/* Adjusted text size */}
         <p className="text-center text-muted-foreground">Zatím zde nejsou žádné příspěvky. Zkuste to prosím později!</p>
       </main>
     );
   }
 
   return (
-    <main className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">Náš Blog</h1>
+    <main className="container mx-auto px-4 py-8 md:py-12"> {/* Adjusted py */}
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Náš Blog</h1> {/* Adjusted text size */}
       
-      {/* Sorting Controls */}
-      <div className="mb-4 flex flex-wrap justify-center sm:justify-end gap-x-4 gap-y-2">
-        <span className="font-semibold text-muted-foreground self-center">Řadit podle:</span>
-        <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'desc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'date' && sortOrder === 'desc' && !categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : (sortBy === 'date' && sortOrder === 'desc' ? 'bg-primary/80 text-primary-foreground hover:bg-primary/70' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80')}`}>
-          Datum (nejnovější)
-        </Link>
-        <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'asc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'date' && sortOrder === 'asc' && !categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : (sortBy === 'date' && sortOrder === 'asc' ? 'bg-primary/80 text-primary-foreground hover:bg-primary/70' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80')}`}>
-          Datum (nejstarší)
-        </Link>
-        <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'asc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'title' && sortOrder === 'asc' && !categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : (sortBy === 'title' && sortOrder === 'asc' ? 'bg-primary/80 text-primary-foreground hover:bg-primary/70' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80')}`}>
-          Název (A-Z)
-        </Link>
-        <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'desc' })}`} className={`text-sm px-3 py-1 rounded-md transition-colors ${sortBy === 'title' && sortOrder === 'desc' && !categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : (sortBy === 'title' && sortOrder === 'desc' ? 'bg-primary/80 text-primary-foreground hover:bg-primary/70' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80')}`}>
-          Název (Z-A)
-        </Link>
-      </div>
-
-      {/* Category Filter Controls */}
-      <div className="mb-10 flex flex-wrap justify-center gap-x-3 gap-y-2 items-center">
-        <span className="font-semibold text-muted-foreground">Filtrovat podle kategorie:</span>
-        <Link href={`/blog?${buildQueryString({ category: undefined }) }`} className={`text-sm px-3 py-1 rounded-md transition-colors ${!categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
-          Všechny
-        </Link>
-        {allCategories.map(category => (
-          <Link key={category} href={`/blog?${buildQueryString({ category: category }) }`} className={`text-sm px-3 py-1 rounded-md transition-colors ${categoryFilter === category ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
-            {category}
+      {/* Combined Sorting and Filtering Controls Area */}
+      <div className="mb-10 space-y-6"> {/* Grouped controls with more bottom margin */}
+        {/* Sorting Controls */}
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2"> {/* Centered controls */}
+          <span className="font-semibold text-muted-foreground mr-2">Řadit podle:</span>
+          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'desc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'date' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Datum (nejnovější)
           </Link>
-        ))}
+          <Link href={`/blog?${buildQueryString({ sort: 'date', order: 'asc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'date' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Datum (nejstarší)
+          </Link>
+          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'asc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'title' && sortOrder === 'asc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Název (A-Z)
+          </Link>
+          <Link href={`/blog?${buildQueryString({ sort: 'title', order: 'desc' })}`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${sortBy === 'title' && sortOrder === 'desc' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Název (Z-A)
+          </Link>
+        </div>
+
+        {/* Category Filter Controls */}
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2"> {/* Centered controls, adjusted gap */}
+          <span className="font-semibold text-muted-foreground mr-2">Filtrovat podle kategorie:</span>
+          <Link href={`/blog?${buildQueryString({ category: undefined }) }`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!categoryFilter ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
+            Všechny
+          </Link>
+          {allCategories.map(category => (
+            <Link key={category} href={`/blog?${buildQueryString({ category: category }) }`} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${categoryFilter === category ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-accent text-accent-foreground hover:bg-accent/80'}`}>
+              {category}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"> {/* Adjusted grid gap and sm breakpoint */}
         {posts.map((post) => (
-          <article key={post.slug} className="flex flex-col bg-card border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+          <article key={post.slug} className="bg-card text-card-foreground border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out flex flex-col h-full"> {/* Added text-card-foreground, shadow-md, ease-in-out, h-full */}
             {post.image && (
               <Link href={`/blog/${post.slug}`} passHref>
-                <div className="relative w-full h-56"> {/* Fixed height for images */}
+                <div className="relative w-full h-52"> {/* Adjusted image height */}
                   <img 
                     src={post.image} 
                     alt={post.title} 
                     className="object-cover w-full h-full" 
-                    // Consider adding loading="lazy" for performance
+                    loading="lazy" // Added lazy loading
                   />
                 </div>
               </Link>
             )}
-            <div className="p-6 flex flex-col flex-grow">
-              <h2 className="text-2xl font-semibold mb-3 min-h-[3em] group-hover:text-primary transition-colors"> {/* min-h for title consistency */}
+            <div className="p-5 flex flex-col flex-grow"> {/* Adjusted padding */}
+              <h2 className="text-xl lg:text-2xl font-semibold mb-3 group-hover:text-primary transition-colors"> {/* Adjusted text size, removed min-h */}
                 <Link href={`/blog/${post.slug}`} className="hover:text-primary transition-colors">
                   {post.title}
                 </Link>
               </h2>
-              <p className="text-sm text-muted-foreground mb-3">
+              <p className="text-sm text-muted-foreground mb-2"> {/* Adjusted margin */}
                 {new Date(post.date).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
-              <div className="mb-4">
+              <div className="flex flex-wrap gap-2 mb-3"> {/* Adjusted container for categories */}
                 {post.categories.map((category) => (
-                  <span key={category} className="inline-block bg-secondary text-secondary-foreground text-xs font-semibold mr-2 mb-2 px-3 py-1 rounded-full">
+                  <span key={category} className="text-xs bg-accent text-accent-foreground px-2.5 py-1 rounded-full whitespace-nowrap hover:bg-accent/80 transition-colors"> {/* Adjusted category tag style */}
                     {category}
                   </span>
                 ))}
               </div>
-              <p className="text-muted-foreground mb-5 flex-grow">{post.excerpt}</p> {/* flex-grow for excerpt */}
-              <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary hover:underline font-semibold mt-auto self-start">
+              <p className="text-muted-foreground text-sm mb-4 flex-grow">{post.excerpt}</p> {/* Added text-sm */}
+              <Link href={`/blog/${post.slug}`} className="mt-auto self-start text-sm font-medium text-primary hover:underline"> {/* Adjusted "Read More" link style */}
                 Číst více <span aria-hidden="true" className="ml-1">&rarr;</span>
               </Link>
             </div>

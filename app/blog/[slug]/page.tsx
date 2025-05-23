@@ -65,36 +65,36 @@ export default async function PostPage({ params }: { params: { slug: string } })
   }
 
   return (
-    <main className="container mx-auto px-4 py-12">
-      <article className="prose lg:prose-xl max-w-none mx-auto"> {/* Using Tailwind Typography for styling markdown */}
-        <header className="mb-8 border-b pb-6">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight">{post.title}</h1>
-          <p className="text-lg text-muted-foreground mb-4">
+    <main className="container mx-auto px-4 py-8 md:py-12">
+      <article className="prose lg:prose-xl max-w-none mx-auto"> {/* Base prose styles */}
+        <header className="mb-8 md:mb-10 border-b pb-6">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 leading-tight">{post.title}</h1>
+          <p className="text-base text-muted-foreground mb-4">
             Publikováno: {new Date(post.date).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           {post.image && (
-            <div className="mt-6 mb-6 relative w-full aspect-video max-h-[500px] overflow-hidden rounded-lg shadow-lg"> {/* Aspect ratio and max height */}
+            <div className="relative w-full h-64 md:h-96 lg:h-[500px] rounded-lg overflow-hidden shadow-lg mb-8">
               <img 
                 src={post.image} 
                 alt={post.title} 
                 className="object-cover w-full h-full" 
-                // Consider adding loading="lazy"
+                loading="lazy" // Added lazy loading
               />
             </div>
           )}
-          <div className="mt-4">
-            <span className="font-semibold">Kategorie: </span>
-            {post.categories.map((category, index) => (
-              <span key={category} className="inline-block bg-secondary text-secondary-foreground text-sm font-medium mr-2 px-3 py-1 rounded-full">
-                {category}{index < post.categories.length - 1 ? '' : ''}
+          <div className="mt-4 mb-6 flex flex-wrap gap-2">
+            <span className="font-semibold self-center">Kategorie: </span> {/* Added self-center for alignment if tags wrap */}
+            {post.categories.map((category) => ( // Removed index from map as it's not used for comma
+              <span key={category} className="text-xs bg-secondary text-secondary-foreground px-3 py-1 rounded-full hover:bg-secondary/80 transition-colors">
+                {category}
               </span>
             ))}
           </div>
         </header>
-        {/* Ensure prose class styles are applied here if not using a global stylesheet for markdown */}
+        {/* Content styled by parent 'prose' class */}
         <div className="prose-p:text-justify prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary-focus" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-        <footer className="mt-12 pt-8 border-t">
-          <Link href="/blog" className="inline-flex items-center text-primary hover:underline">
+        <footer className="mt-10 pt-8 border-t">
+          <Link href="/blog" className="inline-flex items-center text-primary hover:underline text-lg font-medium"> {/* Added inline-flex for icon alignment */}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>

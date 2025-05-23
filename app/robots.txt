@@ -21,4 +21,4 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap location
-Sitemap: https://www.analyticsflow.cz/sitemap.xml
+Sitemap: https://www.analyticsflow.cz/api/sitemap.xml

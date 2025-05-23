@@ -5,55 +5,56 @@ import { writeFileSync } from 'fs';
 import path from 'path';
 
 // Set your website URL here
-const WEBSITE_URL = 'https://yourdomain.com';
+const WEBSITE_URL = 'https://www.analyticsflow.cz';
 
 // Function to generate sitemap entries from your pages
 const generateSitemap = async (): Promise<SitemapEntry[]> => {
-  // Get all .js|.tsx|.ts files inside the pages directory, excluding API routes, _app, _document, etc.
+  // Get all page.{js,ts,jsx,tsx} files inside the app directory, excluding API routes, _*, etc.
   const pages = await globby([
-    'pages/**/*.{js,ts,jsx,tsx}',
-    '!pages/_*.{js,ts,jsx,tsx}',
-    '!pages/api',
-    '!pages/**/[*',  // Exclude dynamic routes for now (we'll handle them separately)
+    'app/**/page.{js,ts,jsx,tsx}',
+    '!app/_*/**', // Exclude directories starting with _ (e.g. _app, _document, _components, _lib)
+    '!app/api/**', // Exclude API routes
   ]);
 
-//   // Add any dynamic routes or additional URLs here
-//   const dynamicRoutes = [
-//     // Example: '/blog/article-1',
-//     // Example: '/products/product-123',
-//   ];
+  // Manually add entries for specific pages
+  const manualEntries: SitemapEntry[] = [
+    { url: `${WEBSITE_URL}/`, lastModified: new Date().toISOString(), changefreq: 'weekly', priority: '1.0' },
+    { url: `${WEBSITE_URL}/cenik`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: `${WEBSITE_URL}/o-nas`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: `${WEBSITE_URL}/podminky`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: `${WEBSITE_URL}/ochrana-soukromi`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: `${WEBSITE_URL}/cookies`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: `${WEBSITE_URL}/kontakt`, lastModified: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
+  ];
 
-  // Generate sitemap entries for static pages
+  // Generate sitemap entries for pages found by globby
   const staticPagesEntries = pages
     .map((page) => {
-      // Remove 'pages' and file extension to get the actual route
+      // Transform path to route: app/some/path/page.tsx -> /some/path
       const route = page
-        .replace('pages', '')
-        .replace(/\.(js|ts|jsx|tsx)$/, '')
-        .replace(/\/index$/, '');
+        .replace(/^app\//, '') // Remove 'app/' prefix
+        .replace(/\/page\.(js|ts|jsx|tsx)$/, '') // Remove '/page.ext'
+        .replace(/\/index$/, ''); // Remove '/index' if it's an index page (though less common with 'app' dir)
+      
+      // Ensure route starts with a slash or is empty (for homepage)
+      const finalRoute = route === '' ? '/' : `/${route}`;
+
+      // Avoid duplicating manually added entries
+      if (manualEntries.some(entry => entry.url === `${WEBSITE_URL}${finalRoute}`)) {
+        return null;
+      }
         
       return {
-        url: `${WEBSITE_URL}${route === '' ? '/' : route}`,
+        url: `${WEBSITE_URL}${finalRoute}`,
         lastModified: new Date().toISOString(),
-        // Add changefreq and priority if needed
-        changefreq: 'weekly',
-        priority: route === '' ? '1.0' : '0.8',
+        changefreq: 'weekly', // Default for other pages
+        priority: '0.8', // Default for other pages
       };
-    });
-
-  // Generate sitemap entries for dynamic routes
-//   const dynamicRoutesEntries = dynamicRoutes.map((route) => {
-//     return {
-//       url: `${WEBSITE_URL}${route}`,
-//       lastModified: new Date().toISOString(),
-//       changefreq: 'weekly',
-//       priority: '0.7',
-//     };
-//   });
+    })
+    .filter(Boolean) as SitemapEntry[]; // Filter out nulls and assert type
 
   // Combine all entries
-  return [...staticPagesEntries];
-    // ...dynamicRoutesEntries];
+  return [...manualEntries, ...staticPagesEntries];
 };
 
 // Define the sitemap entry interface

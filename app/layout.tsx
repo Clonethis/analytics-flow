@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
-import ClarityAnalytics from "../components/measurement/Clarity"
+import ClarityAnalytics from "../components/measurement/Clarity.jsx"
 
 
 const geistSans = Geist({

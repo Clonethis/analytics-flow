@@ -34,7 +34,7 @@ async function getAllBlogPosts(sortBy: string = 'date', sortOrder: string = 'des
         slug,
         title: data.title,
         date: data.date,
-        image: data.image || null, // Handle missing image gracefully
+        image: data.image, // Handle missing image gracefully
         categories: data.categories,
         excerpt: data.excerpt,
         content, // Full markdown content
@@ -70,10 +70,11 @@ async function getAllBlogPosts(sortBy: string = 'date', sortOrder: string = 'des
   return filteredPosts;
 }
 
-export default async function BlogPage({ searchParams }: { searchParams?: { sort?: string; order?: string; category?: string } }) {
-  const sortBy = searchParams?.sort || 'date';
-  const sortOrder = searchParams?.order || 'desc';
-  const categoryFilter = searchParams?.category;
+export default async function BlogPage({ searchParams }: { searchParams?: Promise<{ sort?: string; order?: string; category?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const sortBy = resolvedSearchParams?.sort || 'date';
+  const sortOrder = resolvedSearchParams?.order || 'desc';
+  const categoryFilter = resolvedSearchParams?.category;
 
   // To get all categories for the filter UI, we fetch all posts without category filter first.
   const allPostsForCategoryList = await getAllBlogPosts('date', 'desc'); // Default sort for category list

@@ -1,3 +1,4 @@
+// app/blog/[slug]/page.tsx
 import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
@@ -5,32 +6,47 @@ import Link from 'next/link';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
-import { BlogPost } from '@/lib/types'; // Adjust path if needed
-import { notFound } from 'next/navigation'; // For handling non-existent posts
+import { BlogPost } from '@/lib/types'; // Adjust path if needed, ensure BlogPost provides base fields
+import { notFound } from 'next/navigation';
+// Optional: If you plan to use Metadata API
+// import type { Metadata, ResolvingMetadata } from 'next';
 
 const postsDirectory = path.join(process.cwd(), 'data/blog');
 
 export async function generateStaticParams() {
-  let filenames: string[];
   try {
-    filenames = fs.readdirSync(postsDirectory).filter(name => name.endsWith('.md'));
+    const filenames = fs.readdirSync(postsDirectory);
+    return filenames
+      .filter(name => name.endsWith('.md'))
+      .map(filename => ({
+        slug: filename.replace(/\.md$/, '') 
+      }));
   } catch (error) {
-    console.error("Could not read blog posts directory for generateStaticParams:", error);
-    return []; // Return empty array if directory doesn't exist or is unreadable
+    console.error("Static generation error:", error);
+    return [];
   }
-  return filenames.map((filename) => ({
-    slug: filename.replace(/\.md$/, ''),
-  }));
+}
+
+// Define the properties expected in the frontmatter after parsing
+// This should align with what your BlogPost type (or its relevant parts) would provide
+interface PostFrontmatter {
+  title: string;
+  date: string; // Or Date, if you parse it immediately
+  image?: string;
+  categories: string[];
+  excerpt?: string;
+  // Add any other frontmatter fields you expect from BlogPost
 }
 
 // Type for the enriched post data including contentHtml
-interface FullBlogPost extends Omit<BlogPost, 'content' | 'excerpt'> {
+interface FullBlogPost extends PostFrontmatter {
+  slug: string;
   contentHtml: string;
 }
 
 async function getPostData(slug: string): Promise<FullBlogPost | null> {
   const fullPath = path.join(postsDirectory, `${slug}.md`);
-  
+
   if (!fs.existsSync(fullPath)) {
     return null; // Post not found
   }
@@ -38,10 +54,13 @@ async function getPostData(slug: string): Promise<FullBlogPost | null> {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
 
-  // Basic validation for essential frontmatter fields
-  if (!data.title || !data.date || !data.categories) {
-    console.warn(`Missing essential frontmatter in ${slug}.md for post page.`);
-    return null; // Or handle as appropriate, perhaps by redirecting or showing an error
+  // Validate essential frontmatter fields
+  // Using type assertion for 'data' to help TypeScript understand its shape
+  const frontmatter = data as Partial<PostFrontmatter>;
+
+  if (!frontmatter.title || !frontmatter.date || !frontmatter.categories) {
+    console.warn(`Missing essential frontmatter (title, date, or categories) in ${slug}.md for post page.`);
+    return null;
   }
 
   const processedContent = await remark().use(html).process(content);
@@ -49,16 +68,45 @@ async function getPostData(slug: string): Promise<FullBlogPost | null> {
 
   return {
     slug,
-    title: data.title,
-    date: data.date,
-    image: data.image || null, // Handle missing image gracefully
-    categories: data.categories,
+    title: frontmatter.title,
+    date: frontmatter.date,
+    image: frontmatter.image,
+    categories: frontmatter.categories,
+    excerpt: frontmatter.excerpt,
     contentHtml,
   };
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostData(params.slug);
+// Define Props type for the page component, as expected by Next.js App Router
+type PageContext = {
+  params: Promise<{ slug: string }>;
+  // searchParams?: { [key: string]: string | string[] | undefined }; // Include if you use searchParams
+};
+
+// Optional: Define generateMetadata if you need to set page metadata
+// export async function generateMetadata({ params }: PageContext, parent: ResolvingMetadata): Promise<Metadata> {
+//   const { slug } = await params;
+//   const post = await getPostData(slug);
+//
+//   if (!post) {
+//     return {
+//       title: 'Příspěvek nenalezen',
+//     };
+//   }
+//
+//   return {
+//     title: post.title,
+//     // description: post.excerpt, // If you add excerpt to FullBlogPost
+//     // openGraph: {
+//     //   title: post.title,
+//     //   images: post.image ? [{ url: post.image }] : [],
+//     // },
+//   };
+// }
+
+export default async function PostPage({ params }: PageContext) {
+  const { slug } = await params;
+  const post = await getPostData(slug);
 
   if (!post) {
     notFound(); // Triggers 404 page
@@ -74,17 +122,17 @@ export default async function PostPage({ params }: { params: { slug: string } })
           </p>
           {post.image && (
             <div className="relative w-full h-64 md:h-96 lg:h-[500px] rounded-lg overflow-hidden shadow-lg mb-8">
-              <img 
-                src={post.image} 
-                alt={post.title} 
-                className="object-cover w-full h-full" 
+              <img
+                src={post.image}
+                alt={post.title}
+                className="object-cover w-full h-full"
                 loading="lazy" // Added lazy loading
               />
             </div>
           )}
           <div className="mt-4 mb-6 flex flex-wrap gap-2">
             <span className="font-semibold self-center">Kategorie: </span> {/* Added self-center for alignment if tags wrap */}
-            {post.categories.map((category) => ( // Removed index from map as it's not used for comma
+            {post.categories.map((category) => (
               <span key={category} className="text-xs bg-secondary text-secondary-foreground px-3 py-1 rounded-full hover:bg-secondary/80 transition-colors">
                 {category}
               </span>

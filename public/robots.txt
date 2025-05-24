@@ -1,4 +1,24 @@
+Here's a basic robots.txt file content for a webpage:
+
 User-agent: *
 Allow: /
+Disallow: /private/
+Disallow: /admin/
+Disallow: /cgi-bin/
+Disallow: /tmp/
+Disallow: /includes/
 
-Sitemap: https://analyticsflow.cz/sitemap.xml
+# Block specific file types
+Disallow: /*.pdf$
+Disallow: /*.doc$
+Disallow: /*.xls$
+
+# Allow specific bots more access
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.analyticsflow.cz/api/sitemap.xml

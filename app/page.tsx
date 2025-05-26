@@ -4,61 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import main_image from '@/public/data_main_photo.jpeg'
 import friendly_image from '@/public/friendly_analytics.jpeg'
-import { BarChart3, PieChart, TrendingUp, Database, Shield, Zap, CheckCircle, ArrowRight, Menu } from "lucide-react"
-import { ToggleMenu, ToggleMenuItems } from "@/components/toggle-menu"
+import { BarChart3, PieChart, TrendingUp, Database, Shield, Zap, CheckCircle, ArrowRight } from "lucide-react"
+
 export default function LandingPage() {
-  const menuItems: ToggleMenuItems[] = [
-    { link: '/o-nas', linkText: 'O nás' },
-    { link: '/blog', linkText: 'Blog' },
-    { link: '/cenik', linkText: 'Ceník' },
-    { link: '/kontakt', linkText: 'Kontakt' },
-  ];
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 ml-4 text-primary" />
-            <span className="text-xl font-bold">DataFlow</span>
-          </div>
-          <nav className="hidden md:flex gap-6">
-            <Link href="#sluzby" className="text-sm font-medium hover:text-primary">
-              Služby
-            </Link>
-            <Link href="#jak-to-funguje" className="text-sm font-medium hover:text-primary">
-              Jak to funguje
-            </Link>
-            <Link href="#reference" className="text-sm font-medium hover:text-primary">
-              Reference
-            </Link>
-            <Link href="/o-nas" className="text-sm font-medium hover:text-primary">
-              O nás
-            </Link>
-            <Link href="/blog" className="text-sm font-medium hover:text-primary">
-              Blog
-            </Link>
-            <Link href="/cenik" className="text-sm font-medium hover:text-primary">
-              Ceník
-            </Link>
-            <Link href="/kontakt" className="text-sm font-medium hover:text-primary">
-              Kontakt
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <ToggleMenu menuItems={menuItems}/>
-            {/* <Link href="/prihlaseni" className="hidden md:block text-sm font-medium hover:text-primary">
-              Přihlásit se
-            </Link>
-            <Button asChild>
-              <Link href="/kontakt">Kontaktujte nás</Link>
-            </Button> */}
-            {/* <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Menu</span>
-            </Button> */}
-          </div>
-        </div>
-      </header>
       <main className="flex-1 self-center">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -523,30 +473,6 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
-      <footer className="w-full border-t bg-background py-6 md:py-12">
-        <div className="container flex flex-col items-center justify-center gap-4 px-4 md:px-6 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold">DataFlow</span>
-          </div>
-          <nav className="flex gap-4 sm:gap-6">
-            <Link href="/podminky" className="text-xs hover:underline underline-offset-4">
-              Podmínky
-            </Link>
-            <Link href="/ochrana-soukromi" className="text-xs hover:underline underline-offset-4">
-              Ochrana soukromí
-            </Link>
-            <Link href="/cookies" className="text-xs hover:underline underline-offset-4">
-              Cookies
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} DataFlow. Všechna práva vyhrazena.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import "./globals.css";
 import ClarityAnalytics from "../components/measurement/Clarity.jsx"
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/next"
 
 
 const geistSans = Geist({
@@ -40,6 +41,7 @@ export default function RootLayout({
       </body>
       <GoogleTagManager gtmId="GTM-5H4B3ZZW" />
       <ClarityAnalytics/>
+      <Analytics/>
     </html>
   );
 }

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import ClarityAnalytics from "../components/measurement/Clarity.jsx"
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 
 const geistSans = Geist({
@@ -32,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
         {children}
+        <Footer />
       </body>
       <GoogleTagManager gtmId="GTM-5H4B3ZZW" />
       <ClarityAnalytics/>

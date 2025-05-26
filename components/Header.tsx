@@ -5,6 +5,8 @@ import { ToggleMenu, ToggleMenuItems } from "@/components/toggle-menu"; // Assum
 export default function Header() {
   const menuItems: ToggleMenuItems[] = [
     { link: '/o-nas', linkText: 'O nás' },
+    { link: '/jak-to-funguje', linkText: 'Jak to funguje' },
+    { link: '/reference', linkText: 'Reference' },
     { link: '/blog', linkText: 'Blog' },
     { link: '/cenik', linkText: 'Ceník' },
     { link: '/kontakt', linkText: 'Kontakt' },
@@ -21,10 +23,10 @@ export default function Header() {
           <Link href="#sluzby" className="text-sm font-medium hover:text-primary">
             Služby
           </Link>
-          <Link href="#jak-to-funguje" className="text-sm font-medium hover:text-primary">
+          <Link href="/jak-to-funguje" className="text-sm font-medium hover:text-primary">
             Jak to funguje
           </Link>
-          <Link href="#reference" className="text-sm font-medium hover:text-primary">
+          <Link href="/reference" className="text-sm font-medium hover:text-primary">
             Reference
           </Link>
           <Link href="/o-nas" className="text-sm font-medium hover:text-primary">

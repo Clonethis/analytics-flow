@@ -144,58 +144,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How It Works Section */}
-        <section id="jak-to-funguje" className="w-full py-12 md:py-24 lg:py-32 bg-muted/50">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
-                  Jak to funguje
-                </div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-                  Jednoduchý proces, výjimečné výsledky
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Náš osvědčený postup vám zajistí hladký průběh od prvního kontaktu až po implementaci řešení.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3">
-              {[
-                {
-                  step: "01",
-                  title: "Analýza potřeb",
-                  description:
-                    "Začínáme důkladnou analýzou vašich potřeb a cílů. Identifikujeme klíčové datové zdroje a metriky.",
-                },
-                {
-                  step: "02",
-                  title: "Návrh řešení",
-                  description:
-                    "Vytvoříme návrh řešení na míru, který odpovídá vašim specifickým požadavkům a rozpočtu.",
-                },
-                {
-                  step: "03",
-                  title: "Implementace a podpora",
-                  description:
-                    "Implementujeme řešení, zaškolíme váš tým a poskytujeme průběžnou podporu pro maximální efektivitu.",
-                },
-              ].map((step, index) => (
-                <div key={index} className="relative flex flex-col items-center space-y-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
-                    {step.step}
-                  </div>
-                  <h3 className="text-xl font-bold">{step.title}</h3>
-                  <p className="text-muted-foreground text-center">{step.description}</p>
-                  {index < 2 && (
-                    <div className="absolute top-8 left-full hidden w-16 border-t-2 border-dashed border-muted-foreground lg:block" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Expertise Section */}
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
@@ -242,76 +190,6 @@ export default function LandingPage() {
                   />
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section id="reference" className="w-full py-12 md:py-24 lg:py-32 bg-muted/50">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Reference</div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">Co říkají naši klienti</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Přečtěte si, jak naše služby pomohly firmám po celé České republice.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-3">
-              {[
-                {
-                  quote:
-                    "Spolupráce s DataFlow změnila náš přístup k analýze trhu. Od implementace jejich řešení jsme zvýšili návratnost investic o 37 %.",
-                  author: "Jana Nováková",
-                  role: "Marketingová ředitelka, TechCorp s.r.o.",
-                },
-                {
-                  quote:
-                    "Prediktivní analýza zásadně změnila naše řízení zásob. Za pouhé tři měsíce jsme snížili plýtvání o 42 %.",
-                  author: "Martin Černý",
-                  role: "Provozní ředitel, Retail Solutions a.s.",
-                },
-                {
-                  quote:
-                    "Jednoduchost použití v kombinaci s pokročilými analytickými funkcemi dělá z DataFlow dokonalé řešení pro náš tým. Je to jako mít datového vědce přímo v týmu.",
-                  author: "Eva Svobodová",
-                  role: "Vedoucí datové strategie, Finance Plus s.r.o.",
-                },
-              ].map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col justify-between rounded-lg border bg-background p-6 shadow-sm"
-                >
-                  <div>
-                    <div className="flex gap-0.5 text-primary">
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="h-5 w-5"
-                        >
-                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <blockquote className="mt-4 text-lg font-medium leading-relaxed">"{testimonial.quote}"</blockquote>
-                  </div>
-                  <div className="mt-6 flex items-center">
-                    <div className="rounded-full bg-primary/10 p-1">
-                      <div className="h-8 w-8 rounded-full bg-muted" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium">{testimonial.author}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

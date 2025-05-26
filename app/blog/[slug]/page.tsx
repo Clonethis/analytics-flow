@@ -8,6 +8,7 @@ import { remark } from 'remark';
 import html from 'remark-html';
 import { BlogPost } from '@/lib/types'; // Adjust path if needed, ensure BlogPost provides base fields
 import { notFound } from 'next/navigation';
+import Breadcrumbs from '@/components/Breadcrumbs'; // Added import for Breadcrumbs
 // Optional: If you plan to use Metadata API
 // import type { Metadata, ResolvingMetadata } from 'next';
 
@@ -35,6 +36,7 @@ interface PostFrontmatter {
   image?: string;
   categories: string[];
   excerpt?: string;
+  author?: string; // Added author
   // Add any other frontmatter fields you expect from BlogPost
 }
 
@@ -42,7 +44,52 @@ interface PostFrontmatter {
 interface FullBlogPost extends PostFrontmatter {
   slug: string;
   contentHtml: string;
+  readingTime: string; // Added reading time
+  author?: string; // Added author
+  tocItems?: { id: string; level: number; text: string }[]; // Added ToC items
 }
+
+// Simulating cheerio for HTML parsing and manipulation
+const cheerio = {
+  load: (htmlString: string) => {
+    // Basic Cheerio load simulation
+    let _html = htmlString;
+    return {
+      find: (selector: string) => {
+        // Very basic h2/h3 selector simulation
+        const elements: { tagName: string; text: () => string; attr: (name: string, value?: string) => void | string; html: () => string | null }[] = [];
+        const regex = /<(h[23])(?:[^>]*)>(.*?)<\/\1>/gi;
+        let match;
+        while ((match = regex.exec(_html)) !== null) {
+          const tagName = match[1].toLowerCase();
+          const textContent = match[2].replace(/<[^>]*>/g, '').trim(); // Strip inner tags for text
+          
+          elements.push({
+            tagName: tagName,
+            text: () => textContent,
+            attr: (name: string, value?: string) => {
+              // Simulate adding/getting an attribute - only 'id' for set is implemented for this task
+              if (name === 'id' && value !== undefined) {
+                // This is tricky without real DOM manipulation. We'll modify _html directly.
+                // This is a simplified approach and might break with complex attributes.
+                const originalTag = match[0];
+                if (!originalTag.includes(` id=`)) { // Avoid adding multiple ids
+                  const newTag = originalTag.replace(/<(h[23])/, `<$1 id="${value}"`);
+                  _html = _html.replace(originalTag, newTag);
+                }
+              }
+              return ''; // Getting attributes not implemented for this simulation
+            },
+            html: () => null // Not fully implemented
+          });
+        }
+        return elements;
+      },
+      html: () => _html, // Return the modified HTML
+    };
+  }
+};
+
 
 async function getPostData(slug: string): Promise<FullBlogPost | null> {
   const fullPath = path.join(postsDirectory, `${slug}.md`);
@@ -54,9 +101,16 @@ async function getPostData(slug: string): Promise<FullBlogPost | null> {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
 
+  // Calculate reading time
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const minutesToRead = Math.round(wordCount / 200);
+  const readingTime = `${minutesToRead} min read`;
+
   // Validate essential frontmatter fields
   // Using type assertion for 'data' to help TypeScript understand its shape
-  const frontmatter = data as Partial<PostFrontmatter>;
+  // Using type assertion for 'data' to help TypeScript understand its shape
+  // Explicitly include author in the type assertion for frontmatter
+  const frontmatter = data as Partial<PostFrontmatter & { author?: string }>;
 
   if (!frontmatter.title || !frontmatter.date || !frontmatter.categories) {
     console.warn(`Missing essential frontmatter (title, date, or categories) in ${slug}.md for post page.`);
@@ -64,7 +118,24 @@ async function getPostData(slug: string): Promise<FullBlogPost | null> {
   }
 
   const processedContent = await remark().use(html).process(content);
-  const contentHtml = processedContent.toString();
+  let contentHtml = processedContent.toString();
+
+  // Generate ToC and add IDs to headings
+  const tocItems: { id: string; level: number; text: string }[] = [];
+  const $ = cheerio.load(contentHtml); // Use simulated cheerio
+  const headings = $.find('h2, h3'); // Simulated find
+
+  headings.forEach(el => {
+    const text = el.text();
+    const level = parseInt(el.tagName.substring(1), 10);
+    // Basic slugify: lowercase, replace spaces with hyphens, remove non-alphanumeric (except hyphens)
+    const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    
+    el.attr('id', id); // Add id to the heading in the HTML (simulated)
+    tocItems.push({ id, level, text });
+  });
+
+  contentHtml = $.html(); // Get the modified HTML from simulated cheerio
 
   return {
     slug,
@@ -73,7 +144,10 @@ async function getPostData(slug: string): Promise<FullBlogPost | null> {
     image: frontmatter.image,
     categories: frontmatter.categories,
     excerpt: frontmatter.excerpt,
-    contentHtml,
+    author: frontmatter.author, // Added author
+    contentHtml, // Potentially modified with IDs
+    readingTime, // Added reading time
+    tocItems, // Added ToC items
   };
 }
 
@@ -112,14 +186,28 @@ export default async function PostPage({ params }: PageContext) {
     notFound(); // Triggers 404 page
   }
 
+  const siteBaseUrl = "https://www.example.com"; // Placeholder base URL
+
+  const breadcrumbItems = [
+    { href: "/", label: "Domů" },
+    { href: "/blog", label: "Blog" },
+    { href: `/blog/${post.slug}`, label: post.title },
+  ];
+
   return (
     <main className="container mx-auto px-4 py-8 md:py-12">
+      <Breadcrumbs items={breadcrumbItems} />
       <article className="prose lg:prose-xl max-w-none mx-auto"> {/* Base prose styles */}
         <header className="mb-8 md:mb-10 border-b pb-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 leading-tight">{post.title}</h1>
-          <p className="text-base text-muted-foreground mb-4">
-            Publikováno: {new Date(post.date).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
+          <div className="mb-4"> {/* Wrapper div for consistent bottom margin for the metadata block */}
+            <p className="text-sm text-muted-foreground"> {/* Changed to text-sm, removed mb-4 */}
+              Publikováno: {new Date(post.date).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })} | {post.readingTime}
+            </p>
+            {post.author && (
+              <p className="text-sm text-muted-foreground mt-1">Autor: {post.author}</p>
+            )}
+          </div>
           {post.image && (
             <div className="relative w-full h-64 md:h-96 lg:h-[500px] rounded-lg overflow-hidden shadow-lg mb-8">
               <img
@@ -139,6 +227,23 @@ export default async function PostPage({ params }: PageContext) {
             ))}
           </div>
         </header>
+
+        {/* Table of Contents */}
+        {post.tocItems && post.tocItems.length > 0 && (
+          <nav className="mb-8 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+            <h2 className="text-xl font-semibold mb-3">Obsah článku</h2>
+            <ul className="space-y-2">
+              {post.tocItems.map((item) => (
+                <li key={item.id} className={item.level === 3 ? 'ml-4' : ''}>
+                  <a href={`#${item.id}`} className="text-primary hover:underline">
+                    {item.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+
         {/* Content styled by parent 'prose' class */}
         <div className="prose-p:text-justify prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary-focus" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
         <footer className="mt-10 pt-8 border-t">
@@ -148,6 +253,28 @@ export default async function PostPage({ params }: PageContext) {
             </svg>
             Zpět na všechny příspěvky
           </Link>
+
+          <div className="mt-6 pt-4 border-t">
+            <h3 className="text-lg font-semibold mb-2">Sdílet tento příspěvek:</h3>
+            <div className="flex space-x-4">
+              <a
+                href={`https://twitter.com/intent/tweet?url=${siteBaseUrl}/blog/${post.slug}&text=${encodeURIComponent(post.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                X (Twitter)
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${siteBaseUrl}/blog/${post.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                LinkedIn
+              </a>
+            </div>
+          </div>
         </footer>
       </article>
     </main>

@@ -59,10 +59,11 @@ const cheerio = {
         // Very basic h2/h3 selector simulation
         const elements: { tagName: string; text: () => string; attr: (name: string, value?: string) => void | string; html: () => string | null }[] = [];
         const regex = /<(h[23])(?:[^>]*)>(.*?)<\/\1>/gi;
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = regex.exec(_html)) !== null) {
           const tagName = match[1].toLowerCase();
           const textContent = match[2].replace(/<[^>]*>/g, '').trim(); // Strip inner tags for text
+          const originalTag = match[0]; // Capture the original tag when match is guaranteed to be non-null
           
           elements.push({
             tagName: tagName,
@@ -72,7 +73,6 @@ const cheerio = {
               if (name === 'id' && value !== undefined) {
                 // This is tricky without real DOM manipulation. We'll modify _html directly.
                 // This is a simplified approach and might break with complex attributes.
-                const originalTag = match[0];
                 if (!originalTag.includes(` id=`)) { // Avoid adding multiple ids
                   const newTag = originalTag.replace(/<(h[23])/, `<$1 id="${value}"`);
                   _html = _html.replace(originalTag, newTag);

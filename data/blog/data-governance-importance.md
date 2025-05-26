@@ -1,7 +1,7 @@
 ---
 title: "The Importance of Data Governance in Modern Analytics"
 date: "2024-05-22"
-image: "/images/blog/data-governance.jpg" # Placeholder path
+image: "/images/blog/data-governance.png" # Placeholder path
 categories: ["Data Governance", "Best Practices", "Data Quality"]
 excerpt: "Understand why robust data governance is essential for trustworthy analytics and regulatory compliance."
 ---

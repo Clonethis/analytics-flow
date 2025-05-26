@@ -1,7 +1,7 @@
 ---
 title: "Choosing the Right Analytics Tools for Your Business Needs"
 date: "2024-05-18" # Slightly older date for variety
-image: "/images/blog/analytics-tools.jpg" # Placeholder path
+image: "/images/blog/analytics-tools.png" # Placeholder path
 categories: ["Tools", "Measurement", "Guides"]
 excerpt: "A practical guide to selecting the analytics tools that best fit your company's scale, goals, and technical expertise."
 ---

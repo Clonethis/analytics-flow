@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'; // Example icon
 export default function AboutUsPage() {
   return (
     <main className="flex-1">
-      <section className="w-full py-12 md:py-24 lg:py-32">
+      <section className="w-full py-12 md:py-24 lg:py-32 justify-center flex">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
@@ -26,7 +26,7 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/50">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/50 justify-center flex">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <h2 className="text-2xl font-bold tracking-tighter sm:text-4xl">Náš tým</h2>

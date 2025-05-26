@@ -1,7 +1,7 @@
 ---
 title: "Top 5 Data Quality Best Practices for Your Business"
 date: "2024-05-21"
-image: "/images/blog/data-quality.jpg" # Placeholder path
+image: "/images/blog/data-quality.png" # Placeholder path
 categories: ["Data Quality", "Best Practices"]
 excerpt: "Learn the top 5 best practices to ensure high data quality and make better business decisions."
 ---

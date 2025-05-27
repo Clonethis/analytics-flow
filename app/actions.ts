@@ -20,7 +20,7 @@ export async function subscribeToNewsletter(email: string): Promise<ActionResult
   }
 
   try {
-    await addDoc(collection(db, 'newsletter-signups'), {
+    await addDoc(collection(db, 'analytics-flow-newsletter-signups'), {
       email: email,
       subscribedAt: serverTimestamp(),
     });
@@ -59,7 +59,7 @@ export async function submitCtaForm(formData: CtaFormData): Promise<ActionResult
   }
 
   try {
-    await addDoc(collection(db, 'cta-form-submissions'), {
+    await addDoc(collection(db, 'analytics-form-cta-form-submissions'), {
       name: formData.name,
       email: formData.email,
       company: formData.company,
@@ -105,7 +105,7 @@ export async function submitContactForm(formData: ContactFormData): Promise<Acti
 
 
   try {
-    await addDoc(collection(db, 'contact-inquiries'), {
+    await addDoc(collection(db, 'analytics-flow-contact-inquiries'), {
       name: formData.name,
       email: formData.email,
       subject: formData.subject,

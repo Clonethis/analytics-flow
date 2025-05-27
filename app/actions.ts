@@ -32,6 +32,46 @@ export async function subscribeToNewsletter(email: string): Promise<ActionResult
   }
 }
 
+// Interface for CTA form data
+export interface CtaFormData {
+  name: string;
+  email: string;
+  company: string;
+}
+
+export async function submitCtaForm(formData: CtaFormData): Promise<ActionResult> {
+  // Server-side validation
+  if (!formData.name || !formData.email || !formData.company) {
+    return { success: false, message: 'All fields are required.' };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    return { success: false, message: 'Please enter a valid email address.' };
+  }
+
+  if (formData.name.length < 2) {
+    return { success: false, message: 'Name must be at least 2 characters long.'}
+  }
+
+  if (formData.company.length < 2) {
+    return { success: false, message: 'Company must be at least 2 characters long.'}
+  }
+
+  try {
+    await addDoc(collection(db, 'cta-form-submissions'), {
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      submittedAt: serverTimestamp(),
+    });
+    return { success: true, message: 'Poptávka byla úspěšně odeslána.' };
+  } catch (error) {
+    console.error('Error submitting CTA form:', error);
+    return { success: false, message: 'Něco se pokazilo. Zkuste to prosím znovu.' };
+  }
+}
+
 // Interface for contact form data
 export interface ContactFormData {
   name: string;

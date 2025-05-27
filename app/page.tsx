@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -5,10 +7,66 @@ import { Input } from "@/components/ui/input"
 import main_image from '@/public/data_main_photo.jpeg'
 import friendly_image from '@/public/friendly_analytics.jpeg'
 import { BarChart3, PieChart, TrendingUp, Database, Shield, Zap, CheckCircle, ArrowRight } from "lucide-react"
+import { useState, FormEvent } from "react";
+import { submitCtaForm, CtaFormData } from "./actions";
 
 export default function LandingPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessage('');
+    setIsSuccess(false);
+
+    if (!name) {
+      setMessage("Prosím zadejte Vaše jméno.");
+      return;
+    }
+    if (!email) {
+      setMessage("Prosím zadejte Váš e-mail.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage("Prosím zadejte platný e-mail.");
+      return;
+    }
+    if (!company) {
+      setMessage("Prosím zadejte název společnosti.");
+      return;
+    }
+
+    setIsLoading(true);
+    const result = await submitCtaForm({ name, email, company });
+    setIsLoading(false);
+
+    setMessage(result.message);
+    setIsSuccess(result.success);
+
+    if (result.success) {
+      setName('');
+      setEmail('');
+      setCompany('');
+      setShowSuccessPopup(true);
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 2000);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
+      {showSuccessPopup && (
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white p-6 rounded-lg shadow-xl z-50 text-lg text-center">
+          Děkujeme za Váš e-mail!
+        </div>
+      )}
       <main className="flex-1 self-center">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -313,11 +371,14 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center justify-center">
                 <div className="mx-auto w-full max-w-sm space-y-2">
-                  <form className="grid gap-4">
+                  <form onSubmit={handleSubmit} className="grid gap-4">
                     <div className="grid gap-2">
                       <Input
                         type="text"
                         placeholder="Jméno a příjmení"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={isLoading}
                         className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
                       />
                     </div>
@@ -325,6 +386,9 @@ export default function LandingPage() {
                       <Input
                         type="email"
                         placeholder="E-mail"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
                         className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
                       />
                     </div>
@@ -332,16 +396,24 @@ export default function LandingPage() {
                       <Input
                         type="text"
                         placeholder="Společnost"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        disabled={isLoading}
                         className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
                       />
                     </div>
-                    <Button type="submit" variant="secondary">
-                      Odeslat poptávku
+                    <Button type="submit" variant="secondary" disabled={isLoading}>
+                      {isLoading ? "Odesílám..." : "Odeslat poptávku"}
                     </Button>
                   </form>
+                  {message && (
+                    <p className={`text-sm text-center ${isSuccess ? 'text-green-400' : 'text-red-400'} opacity-90`}>
+                      {message}
+                    </p>
+                  )}
                   <p className="text-xs text-center opacity-70">
                     Odesláním formuláře souhlasíte s našimi{" "}
-                    <Link href="#" className="underline underline-offset-2">
+                    <Link href="/zasady-ochrany-osobnich-udaju" className="underline underline-offset-2">
                       obchodními podmínkami
                     </Link>
                   </p>

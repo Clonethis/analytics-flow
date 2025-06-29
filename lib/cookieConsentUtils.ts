@@ -80,20 +80,18 @@ export const getConsentPreferences = (): ConsentPreferences => {
 /**
  * Checks if the user has already made a consent choice (i.e., the consent cookie exists).
  * This doesn't validate the content, just presence.
- * IMPORTANT: This function is intended for client-side use only, as `hasCookie`
- * from `cookies-next` returns a boolean synchronously on the client.
  * @returns True if the consent cookie exists, false otherwise.
  */
 export const hasMadeConsentChoice = (): boolean => {
-  // On the client, hasCookie returns boolean.
-  // Add a check for window to be explicit about client-side execution.
+  // On the server side, we check if we have the cookie value instead
   if (typeof window === 'undefined') {
-    // This case should ideally not happen if called correctly from client-side logic.
-    // Returning false or throwing an error might be options.
-    // For safety, returning false as if no choice has been made server-side.
-    return false;
+    const cookieValue = getCookie(CONSENT_COOKIE_NAME);
+    return cookieValue !== undefined && cookieValue !== null;
   }
-  return hasCookie(CONSENT_COOKIE_NAME); // This will be boolean on client
+  // On the client, hasCookie returns boolean synchronously
+  const result = hasCookie(CONSENT_COOKIE_NAME);
+  // Ensure we return boolean even if hasCookie might return Promise in some cases
+  return typeof result === 'boolean' ? result : false;
 };
 
 /**

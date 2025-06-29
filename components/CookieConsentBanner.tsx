@@ -97,13 +97,13 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
 
   const handleAcceptAll = () => {
     onAcceptAll();
-    pushToDataLayer({ event: 'consent_update', consent_status: 'accepted_all', analytics_storage: 'granted' });
+    pushToDataLayer({ event: 'consent_update', consent_status: 'accepted_all', analytics_storage: 'granted', ad_storage: 'granted', ad_user_data:'granted', ad_personalization: 'granted' });
     // setIsVisible(false) logic should be handled by parent based on consent state
   };
 
   const handleRejectAll = () => {
     onRejectAll();
-    pushToDataLayer({ event: 'consent_update', consent_status: 'rejected_all', analytics_storage: 'denied' });
+    pushToDataLayer({ event: 'consent_update', consent_status: 'rejected_all', analytics_storage: 'denied', ad_storage: 'denied', ad_user_data:'denied', ad_personalization: 'denied' });
   };
 
   const handleCustomize = () => {

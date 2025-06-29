@@ -30,7 +30,6 @@ export default function CookiesPage() {
               Pokud nám k tomu udělíte souhlas, používáme analytické cookies, které nám pomáhají porozumět, jak návštěvníci interagují s našimi webovými stránkami. Shromažďují anonymizované informace a pomáhají nám vylepšovat obsah a funkčnost stránek. Mezi používané analytické nástroje patří:
               <ul>
                 <li><strong>Google Analytics (přes Google Tag Manager):</strong> Služba pro analýzu webu poskytovaná společností Google, která sleduje a hlásí návštěvnost webových stránek.</li>
-                <li><strong>Microsoft Clarity:</strong> Nástroj pro analýzu uživatelského chování, který nám pomáhá pochopit, jak uživatelé interagují s konkrétními prvky na stránce (např. mapy kliknutí, záznamy sezení).</li>
                 <li><strong>Vercel Analytics:</strong> Služba poskytovaná naší hostingovou platformou Vercel, která sbírá data o výkonu a návštěvnosti.</li>
               </ul>
               Tyto nástroje mohou ukládat cookies k rozlišení jednotlivých uživatelů a ke shromažďování informací o používání stránek.

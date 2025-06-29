@@ -1,11 +1,11 @@
 // app/layout.tsx
 'use client'; // Required for useState, useEffect
 
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { metadata } from "./metadata"; // Import metadata
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
-import ClarityAnalytics from "../components/measurement/Clarity.jsx"; // Keep existing
+// import ClarityAnalytics from "../components/measurement/Clarity.jsx"; // Keep existing
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/next"; // Keep existing
@@ -33,24 +33,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
-export const metadata: Metadata = {
-  title: "Next Generation of Analytics | AnalyticsFlow",
-  description: "Data Analytical service with focus on making companies better",
-  openGraph: {
-    title: "Next Generation of Analytics | AnalyticsFlow",
-    description: "Data Analytical service with focus on making companies better",
-    url: "https://analyticsflow.cz",
-    type: "website",
-    images: [
-      {
-        url: "/data_main_photo.jpeg",
-      },
-    ],
-    siteName: "AnalyticsFlow",
-    locale: "en_US",
-  },
-};
+// Metadata is now imported from app/metadata.ts
 
 export default function RootLayout({
   
@@ -178,8 +161,7 @@ export default function RootLayout({
           />
         )}
 
-        {/* Conditionally load Clarity */}
-        <ClarityAnalytics consent={consent} />
+        {/* ClarityAnalytics component removed */}
 
         {/* Conditionally load Vercel Analytics */}
         {consent.analytics && <Analytics />}

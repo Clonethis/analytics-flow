@@ -9,7 +9,7 @@ export default function TermsPage() {
               Obchodní podmínky
             </h1>
             <p className="text-muted-foreground md:text-lg">
-                Tyto obchodní podmínky upravují vztahy mezi společností DataFlow a jejími klienty při poskytování služeb datové analýzy a konzultací.
+                Tyto obchodní podmínky upravují vztahy mezi společností Analytics Flow a jejími klienty při poskytování služeb datové analýzy a konzultací.
               </p>
               <p className="text-sm text-muted-foreground">
                 Poslední aktualizace: 26. května 2025
@@ -21,10 +21,10 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-bold tracking-tight">1. Úvodní ustanovení</h2>
                 <div className="space-y-3 text-muted-foreground">
                   <p>
-                    Tyto obchodní podmínky (dále jen "Podmínky") upravují vzájemná práva a povinnosti mezi společností DataFlow s.r.o., se sídlem Praha 1, Wenceslas Square 1, 110 00, IČO: 12345678, DIČ: CZ12345678, zapsanou v obchodním rejstříku vedeném Městským soudem v Praze, oddíl C, vložka 123456 (dále jen "Poskytovatel" nebo "DataFlow") a fyzickými či právnickými osobami (dále jen "Klient" nebo "Objednatel") při poskytování služeb datové analýzy, business intelligence a souvisejících konzultačních služeb.
+                    Tyto obchodní podmínky (dále jen "Podmínky") upravují vzájemná práva a povinnosti mezi společností Analytics Flow s.r.o., se sídlem Praha 1, Wenceslas Square 1, 110 00, IČO: 12345678, DIČ: CZ12345678, zapsanou v obchodním rejstříku vedeném Městským soudem v Praze, oddíl C, vložka 123456 (dále jen "Poskytovatel" nebo "Analytics Flow") a fyzickými či právnickými osobami (dále jen "Klient" nebo "Objednatel") při poskytování služeb datové analýzy, business intelligence a souvisejících konzultačních služeb.
                   </p>
                   <p>
-                    Tyto Podmínky se vztahují na všechny služby poskytované DataFlow, včetně, ale nejen na datovou analýzu, vizualizaci dat, business intelligence, prediktivní analýzu, datovou integraci a konzultační služby v oblasti dat.
+                    Tyto Podmínky se vztahují na všechny služby poskytované Analytics Flow, včetně, ale nejen na datovou analýzu, vizualizaci dat, business intelligence, prediktivní analýzu, datovou integraci a konzultační služby v oblasti dat.
                   </p>
                   <p>
                     Uzavřením smlouvy nebo objednáním služeb Klient potvrzuje, že se seznámil s těmito Podmínkami a souhlasí s jejich obsahem.
@@ -75,7 +75,7 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-bold tracking-tight">4. Ceny a platební podmínky</h2>
                 <div className="space-y-3 text-muted-foreground">
                   <p>
-                    Ceny služeb jsou uvedeny v aktuálním ceníku na webových stránkách DataFlow nebo jsou sjednány individuálně na základě rozsahu a složitosti projektu.
+                    Ceny služeb jsou uvedeny v aktuálním ceníku na webových stránkách Analytics Flow nebo jsou sjednány individuálně na základě rozsahu a složitosti projektu.
                   </p>
                   <p>
                     Všechny ceny jsou uvedeny bez DPH. K cenám bude připočtena DPH v zákonné výši, pokud je Poskytovatel plátcem DPH.
@@ -230,7 +230,7 @@ export default function TermsPage() {
               <section className="space-y-4 pt-8 border-t">
                 <h3 className="text-lg font-semibold">Kontaktní údaje</h3>
                 <div className="text-sm text-muted-foreground space-y-1">
-                  <p><strong>DataFlow s.r.o.</strong></p>
+                  <p><strong>Analytics Flow s.r.o.</strong></p>
                   <p>Wenceslas Square 1, 110 00 Praha 1</p>
                   <p>IČO: 12345678, DIČ: CZ12345678</p>
                   <p>Email: info@analytics-flow.cz</p>

@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
                 <h2 className="text-2xl font-bold tracking-tight">1. Správce osobních údajů</h2>
                 <div className="space-y-3 text-muted-foreground">
                   <p>
-                    Správcem vašich osobních údajů je společnost <strong>DataFlow s.r.o.</strong> se sídlem Wenceslas Square 1, 110 00 Praha 1, IČO: 12345678, DIČ: CZ12345678, zapsaná v obchodním rejstříku vedeném Městským soudem v Praze, oddíl C, vložka 123456.
+                    Správcem vašich osobních údajů je společnost <strong>Analytics Flow s.r.o.</strong> se sídlem Wenceslas Square 1, 110 00 Praha 1, IČO: 12345678, DIČ: CZ12345678, zapsaná v obchodním rejstříku vedeném Městským soudem v Praze, oddíl C, vložka 123456.
                   </p>
                   <div className="bg-muted p-4 rounded-lg">
                     <h3 className="font-semibold mb-2">Kontaktní údaje správce:</h3>
@@ -284,7 +284,7 @@ export default function PrivacyPolicyPage() {
                     <p>Pro jakékoli dotazy týkající se ochrany osobních údajů nás kontaktujte:</p>
                     <p><strong>Email:</strong> privacy@analytics-flow.cz</p>
                     <p><strong>Telefon:</strong> +420 123 456 789</p>
-                    <p><strong>Poštovní adresa:</strong> DataFlow s.r.o., Wenceslas Square 1, 110 00 Praha 1</p>
+                    <p><strong>Poštovní adresa:</strong> Analytics Flow s.r.o., Wenceslas Square 1, 110 00 Praha 1</p>
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">

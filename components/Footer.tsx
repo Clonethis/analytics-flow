@@ -50,7 +50,7 @@ export default function Footer() {
           <div className="flex flex-col items-start gap-3"> {/* Increased gap */}
             <div className="flex items-center gap-2">
               <BarChart3 className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">DataFlow</span>
+              <span className="text-lg font-bold">Analytics Flow</span>
             </div>
             <p className="text-sm text-muted-foreground"> {/* Slightly larger text for tagline */}
               Data-driven insights for your business.
@@ -97,7 +97,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t pt-8 text-center text-sm text-muted-foreground"> {/* Increased spacing and font size */}
-          © {new Date().getFullYear()} DataFlow. Všechna práva vyhrazena.
+          © {new Date().getFullYear()} Analytics Flow. Všechna práva vyhrazena.
         </div>
       </div>
     </footer>

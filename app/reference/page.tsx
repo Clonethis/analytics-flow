@@ -18,7 +18,7 @@ const testimonialsData: Testimonial[] = [
   },
   {
     id: 2,
-    quote: "Spolupráce s DataFlow byla klíčová pro naši expanzi na nové trhy. Jejich prediktivní modely nám pomohly identifikovat nejperspektivnější segmenty a minimalizovat rizika. Oceňujeme především jejich proaktivní přístup a hluboké znalosti.",
+    quote: "Spolupráce s Analytics Flow byla klíčová pro naši expanzi na nové trhy. Jejich prediktivní modely nám pomohly identifikovat nejperspektivnější segmenty a minimalizovat rizika. Oceňujeme především jejich proaktivní přístup a hluboké znalosti.",
     author: "Petr Svoboda",
     role: "Obchodní Ředitel",
     company: "ExpandGlobal a.s.",
@@ -34,7 +34,7 @@ const testimonialsData: Testimonial[] = [
   },
   {
     id: 4,
-    quote: "Oceňuji individuální přístup a schopnost týmu DataFlow vysvětlit složité datové koncepty srozumitelnou formou. Pomohli nám nastavit datovou strategii, která skutečně funguje a přináší výsledky.",
+    quote: "Oceňuji individuální přístup a schopnost týmu Analytics Flow vysvětlit složité datové koncepty srozumitelnou formou. Pomohli nám nastavit datovou strategii, která skutečně funguje a přináší výsledky.",
     author: "Eva Králová",
     role: "Jednatelka společnosti",
     company: "RodinnáFirma Group",

@@ -262,7 +262,7 @@ export default function LandingPage() {
                     Připraveni využít potenciál vašich dat?
                   </h2>
                   <p className="max-w-[600px] opacity-90 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    Začněte spolupráci s DataFlow ještě dnes a objevte skryté možnosti ve vašich datech. Domluvte si
+                    Začněte spolupráci s Analytics Flow ještě dnes a objevte skryté možnosti ve vašich datech. Domluvte si
                     nezávaznou konzultaci s našimi specialisty.
                   </p>
                 </div>

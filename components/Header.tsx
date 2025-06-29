@@ -18,7 +18,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <BarChart3 className="h-6 w-6 text-primary" />
           <Link href="/">
-          <span className="text-xl font-bold">DataFlow</span>
+          <span className="text-xl font-bold">Analytics Flow</span>
           </Link>
         </div>
         <nav className="hidden md:flex items-center gap-6">

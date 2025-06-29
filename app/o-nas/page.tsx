@@ -12,7 +12,7 @@ export default function AboutUsPage() {
               O nás
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              Jsme DataFlow, tým vášnivých datových analytiků, kteří pomáhají firmám růst díky síle dat. Naše mise je transformovat komplexní data na srozumitelné přehledy a strategické výhody.
+              Jsme Analytics Flow, tým vášnivých datových analytiků, kteří pomáhají firmám růst díky síle dat. Naše mise je transformovat komplexní data na srozumitelné přehledy a strategické výhody.
             </p>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
               Více informací o našem týmu, hodnotách a přístupu již brzy!

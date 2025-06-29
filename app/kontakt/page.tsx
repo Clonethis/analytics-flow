@@ -184,7 +184,7 @@ export default function KontaktPage() {
             <p>602 00 Brno-střed-Trnitá</p>
             <p>Česká republika</p>
             <p className="mt-2">
-              <Link href="mailto:info@dataflow.cz" className="hover:text-primary">info@dataflow.cz</Link>
+              <Link href="mailto:info@analytics-flow.cz" className="hover:text-primary">info@analytics-flow.cz</Link>
             </p>
             {/* <p className="mt-1">
               <Link href="tel:+420123456789" className="hover:text-primary">+420 123 456 789</Link>
@@ -196,7 +196,7 @@ export default function KontaktPage() {
             <div className="space-y-3 text-sm">
               <div>
                 <p className="font-medium text-foreground">Název společnosti:</p>
-                <p className="text-muted-foreground">DataFlow Solutions s.r.o. (Placeholder)</p>
+                <p className="text-muted-foreground">Analytics Flow Solutions s.r.o. (Placeholder)</p>
               </div>
               <div>
                 <p className="font-medium text-foreground">Sídlo (Fakturační adresa):</p>

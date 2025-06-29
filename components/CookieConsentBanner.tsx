@@ -64,18 +64,18 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
   return (
     <div style={bannerStyles}>
       <p style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
-        We use cookies to enhance your experience. By clicking "Accept All", you agree to our use of cookies for analytical purposes.
+        Používáme soubory cookie pro zlepšení vašeho zážitku. Kliknutím na "Přijmout vše" souhlasíte s naším používáním souborů cookie pro analytické účely.
       </p>
       <div style={buttonContainerStyles}>
         <button style={buttonStyles} onClick={() => { onAcceptAll(); setIsVisible(false); }}>
-          Accept All
+          Přijmout Vše
         </button>
         <button style={buttonStyles} onClick={() => { onRejectAll(); setIsVisible(false); }}>
-          Reject All
+          Odmítnout
         </button>
         {/* We can refine the customize experience later. For now, it acts like a toggle for analytics. */}
         <button style={smallButtonStyles} onClick={() => { onCustomize(); setIsVisible(false); }}>
-          Customize
+          Nastavit
         </button>
       </div>
       <div style={{ marginTop: '10px', fontSize: '12px' }}>

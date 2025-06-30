@@ -2,6 +2,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import CookieCustomizationModal from './CookieCustomizationModal';
+import {
+  ConsentPreferences,
+  saveConsentPreferences,
+  grantAllConsent,
+  rejectAllConsent,
+  getConsentPreferences as loadInitialPreferences // Renamed for clarity in this context
+} from '../lib/cookieConsentUtils';
 
 // Helper function to push to GTM dataLayer
 const pushToDataLayer = (eventData: Record<string, any>) => {
@@ -13,6 +21,18 @@ const pushToDataLayer = (eventData: Record<string, any>) => {
   } else {
     console.log('dataLayer not found, GTM event not sent:', eventData);
   }
+};
+
+// GTM event for specific consent choices
+const pushConsentChoicesToDataLayer = (preferences: ConsentPreferences) => {
+  pushToDataLayer({
+    event: 'consent_update',
+    consent_status: 'customized', // Or determine based on choices
+    analytics_storage: preferences.analytics ? 'granted' : 'denied',
+    marketing_storage: preferences.marketing ? 'granted' : 'denied',
+    preferences_storage: preferences.preferences ? 'granted' : 'denied',
+    // essential_storage is always 'granted'
+  });
 };
 
 
@@ -82,38 +102,86 @@ const tertiaryButtonStyles: React.CSSProperties = {
 
 
 interface CookieConsentBannerProps {
-  onAcceptAll: () => void;
-  onRejectAll: () => void;
-  onCustomize: () => void;
+  // These props will now be handled by the parent component that decides to show this banner
+  // For example, a global state or a layout component would call these utility functions
+  // and then hide the banner.
+  onConsentGiven: () => void;
+  initialPreferences: ConsentPreferences;
 }
 
 const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
-  onAcceptAll,
-  onRejectAll,
-  onCustomize,
+  onConsentGiven,
+  initialPreferences: initialPrefsFromProp
 }) => {
-  // The parent component that uses this banner will control its visibility
-  // based on actual consent status. This component is always "visible" when rendered.
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+  // Store current preferences, initialized from props (which should come from getConsentPreferences)
+  const [currentPreferences, setCurrentPreferences] = useState<ConsentPreferences>(initialPrefsFromProp);
+
+  useEffect(() => {
+    setCurrentPreferences(initialPrefsFromProp);
+  }, [initialPrefsFromProp]);
+
 
   const handleAcceptAll = () => {
-    onAcceptAll();
-    pushToDataLayer({ event: 'consent_update', consent_status: 'accepted_all', analytics_storage: 'granted', ad_storage: 'granted', ad_user_data:'granted', ad_personalization: 'granted' });
-    // setIsVisible(false) logic should be handled by parent based on consent state
+    const newPrefs = grantAllConsent(); // Saves cookie and returns new prefs
+    setCurrentPreferences(newPrefs);
+    pushConsentChoicesToDataLayer(newPrefs);
+    onConsentGiven(); // Signal parent to hide banner
   };
 
   const handleRejectAll = () => {
-    onRejectAll();
-    pushToDataLayer({ event: 'consent_update', consent_status: 'rejected_all', analytics_storage: 'denied', ad_storage: 'denied', ad_user_data:'denied', ad_personalization: 'denied' });
+    const newPrefs = rejectAllConsent(); // Saves cookie and returns new prefs
+    setCurrentPreferences(newPrefs);
+    pushConsentChoicesToDataLayer(newPrefs);
+    onConsentGiven(); // Signal parent to hide banner
   };
 
-  const handleCustomize = () => {
-    onCustomize();
-    // Depending on the customize flow, a different GTM event might be pushed after customization.
-    // For now, we can log that customize was initiated.
+  const openCustomizeModal = () => {
+    // Load fresh preferences in case they were changed elsewhere or for initial load
+    setCurrentPreferences(loadInitialPreferences());
+    setShowCustomizeModal(true);
     pushToDataLayer({ event: 'consent_customize_open' });
-    // If customize immediately sets a state and closes, then a consent_update event should be here.
   };
 
+  const handleSaveCustomizedPreferences = (prefs: ConsentPreferences) => {
+    saveConsentPreferences(prefs);
+    setCurrentPreferences(prefs);
+    pushConsentChoicesToDataLayer(prefs);
+    setShowCustomizeModal(false);
+    onConsentGiven(); // Signal parent to hide banner
+  };
+
+  const handleAcceptAllFromCustomModal = () => {
+    const newPrefs = grantAllConsent();
+    setCurrentPreferences(newPrefs);
+    pushConsentChoicesToDataLayer(newPrefs);
+    setShowCustomizeModal(false);
+    onConsentGiven();
+  };
+
+  const handleRejectAllFromCustomModal = () => {
+    const newPrefs = rejectAllConsent();
+    setCurrentPreferences(newPrefs);
+    pushConsentChoicesToDataLayer(newPrefs);
+    setShowCustomizeModal(false);
+    onConsentGiven();
+  };
+
+
+  if (showCustomizeModal) {
+    return (
+      <CookieCustomizationModal
+        initialPreferences={currentPreferences}
+        onSave={handleSaveCustomizedPreferences}
+        onAcceptAll={handleAcceptAllFromCustomModal}
+        onRejectAll={handleRejectAllFromCustomModal}
+        onClose={() => setShowCustomizeModal(false)}
+        isVisible={true}
+      />
+    );
+  }
+
+  // Render the main banner if customize modal is not shown
   return (
     <div style={overlayStyles}>
       <div style={modalStyles}>
@@ -126,9 +194,9 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
             Přijmout Vše
           </button>
           <button style={secondaryButtonStyles} onClick={handleRejectAll}>
-            Odmítnout Vše
+            Odmítnout Všechny (kromě nezbytných)
           </button>
-          <button style={tertiaryButtonStyles} onClick={handleCustomize}>
+          <button style={tertiaryButtonStyles} onClick={openCustomizeModal}>
             Přizpůsobit
           </button>
         </div>

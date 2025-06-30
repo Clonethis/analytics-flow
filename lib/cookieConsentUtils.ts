@@ -102,7 +102,7 @@ export const hasMadeConsentChoice = (): boolean => {
     // For safety, returning false as if no choice has been made server-side.
     return false;
   }
-  return hasCookie(CONSENT_COOKIE_NAME); // This will be boolean on client
+  return hasCookie(CONSENT_COOKIE_NAME) as boolean; // Explicit type assertion
 };
 
 /**

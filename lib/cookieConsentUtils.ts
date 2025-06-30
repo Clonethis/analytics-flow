@@ -2,20 +2,25 @@
 import { setCookie, getCookie, hasCookie } from 'cookies-next';
 
 export const CONSENT_COOKIE_NAME = 'user_consent_preferences';
-export const COOKIE_VERSION = '1.0'; // Versioning for future updates
+export const COOKIE_VERSION = '2.0'; // Updated version for new structure
 
 export interface ConsentPreferences {
-  version: string; // Version of the consent structure/banner
-  timestamp: number; // When the consent was given
-  analytics: boolean; // Example category: true if analytics allowed, false otherwise
-  // Add other categories here as needed, e.g., marketing: boolean;
+  version: string;
+  timestamp: number;
+  essential: true; // Essential cookies are always active and cannot be disabled
+  analytics: boolean;
+  marketing: boolean;
+  preferences: boolean;
 }
 
-// Default consent: typically all denied until explicitly accepted
+// Default consent: essential is true, others are false until explicitly accepted.
 export const defaultConsent: ConsentPreferences = {
   version: COOKIE_VERSION,
   timestamp: 0,
+  essential: true,
   analytics: false,
+  marketing: false,
+  preferences: false,
 };
 
 /**
@@ -50,58 +55,68 @@ export const getConsentPreferences = (): ConsentPreferences => {
   if (cookieValue && typeof cookieValue === 'string') {
     try {
       const parsed = JSON.parse(cookieValue) as Partial<ConsentPreferences>;
-      // Basic validation: check if it has an analytics property and a version.
-      // More robust validation might be needed for version migrations.
-      if (typeof parsed.analytics === 'boolean' && parsed.version) {
-        // If old version, could potentially migrate or reset to default.
-        // For now, if version doesn't match, we could reset to default or handle migration.
-        // Let's assume for now that any valid cookie with a version is acceptable,
-        // or we can enforce version match:
-        if (parsed.version !== COOKIE_VERSION) {
-            // If versions mismatch, it might be safer to return default consent,
-            // forcing re-consent for the new banner version.
-            // Or, implement a migration strategy. For now, let's re-evaluate.
-            // For simplicity in this step, if there's a cookie, we'll assume it's valid enough
-            // and the banner logic itself will handle if re-prompt is needed based on version.
-            // A more robust approach would be to clear old versions or migrate.
-            // Let's just return default if version is not current.
-             return { ...defaultConsent, ...parsed, version: parsed.version || COOKIE_VERSION };
-        }
-        return { ...defaultConsent, ...parsed };
+
+      // If the cookie version does not match the current version,
+      // or if essential fields are missing, return default to force re-consent.
+      if (
+        parsed.version !== COOKIE_VERSION ||
+        typeof parsed.analytics !== 'boolean' || // Check one of the new fields
+        typeof parsed.marketing !== 'boolean' || // Check another new field
+        typeof parsed.preferences !== 'boolean' // Check another new field
+      ) {
+        // Versions mismatch or structure is old/invalid, force re-consent by returning defaults.
+        // No need to save default consent here, the banner will prompt for new choices.
+        return { ...defaultConsent, timestamp: 0 }; // Reset timestamp too
       }
+
+      // If version matches and structure seems valid, return the parsed preferences,
+      // ensuring essential is always true.
+      return {
+        ...defaultConsent, // Provides defaults for any potentially missing non-critical fields
+        ...parsed,
+        essential: true, // Ensure essential is always true, regardless of what's in cookie
+        version: COOKIE_VERSION, // Ensure version is current
+      };
     } catch (error) {
       console.error('Error parsing consent cookie:', error);
-      // Fall through to return default consent
+      // Fall through to return default consent, forcing re-consent.
     }
   }
-  return { ...defaultConsent, timestamp: 0 }; // Ensure timestamp is 0 if no valid cookie
+  // No cookie found or error in parsing, return default to force consent.
+  return { ...defaultConsent, timestamp: 0 };
 };
 
 /**
  * Checks if the user has already made a consent choice (i.e., the consent cookie exists).
  * This doesn't validate the content, just presence.
+ * IMPORTANT: This function is intended for client-side use only, as `hasCookie`
+ * from `cookies-next` returns a boolean synchronously on the client.
  * @returns True if the consent cookie exists, false otherwise.
  */
 export const hasMadeConsentChoice = (): boolean => {
-  // On the server side, we check if we have the cookie value instead
+  // On the client, hasCookie returns boolean.
+  // Add a check for window to be explicit about client-side execution.
   if (typeof window === 'undefined') {
-    const cookieValue = getCookie(CONSENT_COOKIE_NAME);
-    return cookieValue !== undefined && cookieValue !== null;
+    // This case should ideally not happen if called correctly from client-side logic.
+    // Returning false or throwing an error might be options.
+    // For safety, returning false as if no choice has been made server-side.
+    return false;
   }
-  // On the client, hasCookie returns boolean synchronously
-  const result = hasCookie(CONSENT_COOKIE_NAME);
-  // Ensure we return boolean even if hasCookie might return Promise in some cases
-  return typeof result === 'boolean' ? result : false;
+  return hasCookie(CONSENT_COOKIE_NAME) as boolean; // Explicit type assertion
 };
 
 /**
- * Helper function to grant consent for all categories (currently just analytics).
+ * Helper function to grant consent for all non-essential categories.
+ * Essential cookies remain true.
  */
 export const grantAllConsent = (): ConsentPreferences => {
   const newPreferences: ConsentPreferences = {
-    ...defaultConsent,
+    ...defaultConsent, // Includes essential: true, version, and timestamp placeholder
     analytics: true,
-    timestamp: Date.now(),
+    marketing: true,
+    preferences: true,
+    timestamp: Date.now(), // Overwrite timestamp
+    version: COOKIE_VERSION, // Ensure current version
   };
   saveConsentPreferences(newPreferences);
   return newPreferences;
@@ -109,12 +124,16 @@ export const grantAllConsent = (): ConsentPreferences => {
 
 /**
  * Helper function to reject all non-essential categories.
+ * Essential cookies remain true.
  */
 export const rejectAllConsent = (): ConsentPreferences => {
   const newPreferences: ConsentPreferences = {
-    ...defaultConsent,
-    analytics: false, // Explicitly set analytics to false
-    timestamp: Date.now(),
+    ...defaultConsent, // Includes essential: true, version, and timestamp placeholder
+    analytics: false,
+    marketing: false,
+    preferences: false,
+    timestamp: Date.now(), // Overwrite timestamp
+    version: COOKIE_VERSION, // Ensure current version
   };
   saveConsentPreferences(newPreferences);
   return newPreferences;

@@ -2,26 +2,23 @@
 'use client'; // Required for useState, useEffect
 
 import { Geist, Geist_Mono } from "next/font/google";
-import { metadata } from "./metadata"; // Import metadata
+// import { metadata } from "./metadata"; // Metadata is typically not used in a 'use client' root layout directly
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
-// import ClarityAnalytics from "../components/measurement/Clarity.jsx"; // Keep existing
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Analytics } from "@vercel/analytics/next"; // Keep existing
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next"; // Renamed to avoid conflict
 
 // Imports for Cookie Consent
 import React, { useState, useEffect } from 'react';
 import CookieConsentBanner from '../components/CookieConsentBanner';
 import {
   getConsentPreferences,
-  saveConsentPreferences,
-  grantAllConsent,
-  rejectAllConsent,
+  hasMadeConsentChoice,
   COOKIE_VERSION,
   ConsentPreferences,
   defaultConsent
-} from '../lib/cookieConsentUtils'; // Adjust path as needed
+} from '../lib/cookieConsentUtils';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,86 +38,47 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [showBanner, setShowBanner] = useState(false);
-  // Initialize with defaultConsent, useEffect will update it from cookie
-  const [consent, setConsent] = useState<ConsentPreferences>(defaultConsent);
+  const [displayBanner, setDisplayBanner] = useState(false);
+  const [bannerInitialPrefs, setBannerInitialPrefs] = useState<ConsentPreferences>(defaultConsent);
+  // State to track if Vercel analytics should be enabled, separate from banner display
+  const [enableVercelAnalytics, setEnableVercelAnalytics] = useState(false);
+
 
   useEffect(() => {
-    const currentConsent = getConsentPreferences();
-    setConsent(currentConsent);
-    if (currentConsent.timestamp === 0 || currentConsent.version !== COOKIE_VERSION) {
-      setShowBanner(true);
+    const initialPrefs = getConsentPreferences();
+    setBannerInitialPrefs(initialPrefs); // For passing to banner if it's shown
+    setEnableVercelAnalytics(initialPrefs.analytics); // Set Vercel analytics based on current consent
+
+    const choiceMade = hasMadeConsentChoice();
+    const versionMatch = initialPrefs.version === COOKIE_VERSION;
+
+    if (!choiceMade || !versionMatch) {
+      setDisplayBanner(true);
+      // If version mismatch but choice was made, ensure banner gets fresh defaults
+      // for the customization modal.
+      if (!versionMatch && choiceMade) {
+        setBannerInitialPrefs(defaultConsent);
+      }
     } else {
-      // If consent already exists, update GTM
-      // This handles the case where user re-visits and already has consent
-      if (typeof window.gtag === 'function') { // Ensure gtag is available
+      // If consent is valid and already given, ensure GTM is updated.
+      // The banner's internal GTM calls handle updates when choices are made *through the banner*.
+      // This handles the case for subsequent page loads where the banner isn't shown.
+      if (typeof window.gtag === 'function') {
         window.gtag('consent', 'update', {
-          'analytics_storage': currentConsent.analytics ? 'granted' : 'denied'
+          'analytics_storage': initialPrefs.analytics ? 'granted' : 'denied',
+          'marketing_storage': initialPrefs.marketing ? 'granted' : 'denied',
+          'preferences_storage': initialPrefs.preferences ? 'granted' : 'denied',
+          // ad_storage can be added if marketing implies ad cookies
         });
       }
     }
   }, []);
 
-  const updateGtmConsent = (analyticsGranted: boolean) => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('consent', 'update', {
-        'analytics_storage': analyticsGranted ? 'granted' : 'denied'
-        // Add other consent types if used by your GTM tags
-      });
-    }
-  };
-
-  const handleAcceptAll = () => {
-    const newConsent = grantAllConsent();
-    setConsent(newConsent);
-    setShowBanner(false);
-    updateGtmConsent(true);
-
-    // Log consent to GA4 via dataLayer
-    if (typeof window.dataLayer !== 'undefined') {
-      window.dataLayer.push({
-        'event': 'cookie_consent_update', // Custom event name
-        'consent_timestamp': Math.floor(newConsent.timestamp / 1000), // Unix timestamp in seconds
-        'consent_analytics_granted': newConsent.analytics, // boolean
-        'cookie_banner_version': COOKIE_VERSION
-      });
-    }
-  };
-
-  const handleRejectAll = () => {
-    const newConsent = rejectAllConsent();
-    setConsent(newConsent);
-    setShowBanner(false);
-    updateGtmConsent(false);
-
-    // Log consent to GA4 via dataLayer
-    if (typeof window.dataLayer !== 'undefined') {
-      window.dataLayer.push({
-        'event': 'cookie_consent_update',
-        'consent_timestamp': Math.floor(newConsent.timestamp / 1000),
-        'consent_analytics_granted': newConsent.analytics,
-        'cookie_banner_version': COOKIE_VERSION
-      });
-    }
-  };
-
-  const handleCustomize = () => {
-    // For this step, let's make customize also accept all for simplicity.
-    // A real implementation would save the specific choices made in a customize UI.
-    const newConsent = grantAllConsent();
-    setConsent(newConsent);
-    setShowBanner(false);
-    updateGtmConsent(newConsent.analytics);
-
-    // Log consent to GA4 via dataLayer
-    if (typeof window.dataLayer !== 'undefined') {
-      window.dataLayer.push({
-        'event': 'cookie_consent_update',
-        'consent_timestamp': Math.floor(newConsent.timestamp / 1000),
-        'consent_analytics_granted': newConsent.analytics,
-        'cookie_banner_version': COOKIE_VERSION
-      });
-    }
+  const handleConsentFinalized = () => {
+    setDisplayBanner(false);
+    // After consent is given through the banner, update Vercel analytics status
+    const currentPrefs = getConsentPreferences();
+    setEnableVercelAnalytics(currentPrefs.analytics);
   };
 
   return (
@@ -134,11 +92,12 @@ export default function RootLayout({
               function gtag(){dataLayer.push(arguments);}
               gtag('consent', 'default', {
                 'analytics_storage': 'denied',
-                'ad_storage': 'denied', // Include if relevant, good practice
-                'personalization_storage': 'denied', // Include if relevant
-                'functionality_storage': 'granted', // Usually needed for site to work
-                'security_storage': 'granted' // Usually needed for site to work
-                // Add other GTM consent types as needed
+                'ad_storage': 'denied',
+                'marketing_storage': 'denied', // Explicitly deny marketing
+                'preferences_storage': 'denied', // Explicitly deny preferences
+                'personalization_storage': 'denied',
+                'functionality_storage': 'granted',
+                'security_storage': 'granted'
               });
             `,
           }}
@@ -153,18 +112,14 @@ export default function RootLayout({
         {children}
         <Footer />
 
-        {showBanner && (
+        {displayBanner && (
           <CookieConsentBanner
-            onAcceptAll={handleAcceptAll}
-            onRejectAll={handleRejectAll}
-            onCustomize={handleCustomize}
+            onConsentGiven={handleConsentFinalized}
+            initialPreferences={bannerInitialPrefs}
           />
         )}
 
-        {/* ClarityAnalytics component removed */}
-
-        {/* Conditionally load Vercel Analytics */}
-        {consent.analytics && <Analytics />}
+        {enableVercelAnalytics && <VercelAnalytics />}
       </body>
     </html>
   );

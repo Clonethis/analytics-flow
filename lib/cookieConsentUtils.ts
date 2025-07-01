@@ -7,20 +7,23 @@ export const COOKIE_VERSION = '2.0'; // Updated version for new structure
 export interface ConsentPreferences {
   version: string;
   timestamp: number;
-  essential: true; // Essential cookies are always active and cannot be disabled
-  analytics: boolean;
-  marketing: boolean;
-  preferences: boolean;
+  // essential: true; // Essential cookies are always active and cannot be disabled
+  // analytics: boolean;
+  // marketing: boolean;
+  ad_storage: boolean;
+  ad_user_data: boolean;
+  ad_personalization: boolean;
+  analytics_storage: boolean;
 }
 
 // Default consent: essential is true, others are false until explicitly accepted.
 export const defaultConsent: ConsentPreferences = {
   version: COOKIE_VERSION,
   timestamp: 0,
-  essential: true,
-  analytics: false,
-  marketing: false,
-  preferences: false,
+  ad_storage: false,
+  ad_user_data: true,
+  ad_personalization: false,
+  analytics_storage:false
 };
 
 /**
@@ -60,9 +63,10 @@ export const getConsentPreferences = (): ConsentPreferences => {
       // or if essential fields are missing, return default to force re-consent.
       if (
         parsed.version !== COOKIE_VERSION ||
-        typeof parsed.analytics !== 'boolean' || // Check one of the new fields
-        typeof parsed.marketing !== 'boolean' || // Check another new field
-        typeof parsed.preferences !== 'boolean' // Check another new field
+        typeof parsed.ad_storage !== 'boolean' || // Check one of the new fields
+        typeof parsed.ad_user_data !== 'boolean' || // Check another new field
+        typeof parsed.ad_personalization !== 'boolean' ||// Check another new field
+        typeof parsed.analytics_storage !== 'boolean' // Check another new field
       ) {
         // Versions mismatch or structure is old/invalid, force re-consent by returning defaults.
         // No need to save default consent here, the banner will prompt for new choices.
@@ -74,7 +78,7 @@ export const getConsentPreferences = (): ConsentPreferences => {
       return {
         ...defaultConsent, // Provides defaults for any potentially missing non-critical fields
         ...parsed,
-        essential: true, // Ensure essential is always true, regardless of what's in cookie
+        // essential: true, // Ensure essential is always true, regardless of what's in cookie
         version: COOKIE_VERSION, // Ensure version is current
       };
     } catch (error) {
@@ -111,11 +115,12 @@ export const hasMadeConsentChoice = (): boolean => {
  */
 export const grantAllConsent = (): ConsentPreferences => {
   const newPreferences: ConsentPreferences = {
-    ...defaultConsent, // Includes essential: true, version, and timestamp placeholder
-    analytics: true,
-    marketing: true,
-    preferences: true,
-    timestamp: Date.now(), // Overwrite timestamp
+    // ...defaultConsent, // Includes essential: true, version, and timestamp placeholder
+    ad_storage: true,
+    ad_user_data: true,
+    ad_personalization: true, 
+    analytics_storage: true,
+    timestamp: Date.now(), //  Overwrite timestamp
     version: COOKIE_VERSION, // Ensure current version
   };
   saveConsentPreferences(newPreferences);
@@ -129,9 +134,10 @@ export const grantAllConsent = (): ConsentPreferences => {
 export const rejectAllConsent = (): ConsentPreferences => {
   const newPreferences: ConsentPreferences = {
     ...defaultConsent, // Includes essential: true, version, and timestamp placeholder
-    analytics: false,
-    marketing: false,
-    preferences: false,
+    ad_storage: false,
+    ad_user_data: false,
+    ad_personalization: false, 
+    analytics_storage: false,
     timestamp: Date.now(), // Overwrite timestamp
     version: COOKIE_VERSION, // Ensure current version
   };
@@ -148,7 +154,7 @@ export const toggleAnalyticsConsent = (): ConsentPreferences => {
   const currentPrefs = getConsentPreferences();
   const newPreferences: ConsentPreferences = {
     ...currentPrefs,
-    analytics: !currentPrefs.analytics, // Toggle analytics
+    analytics_storage: !currentPrefs.analytics_storage, // Toggle analytics
     timestamp: Date.now(),
   };
   saveConsentPreferences(newPreferences);

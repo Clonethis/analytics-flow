@@ -25,12 +25,16 @@ const pushToDataLayer = (eventData: Record<string, any>) => {
 
 // GTM event for specific consent choices
 const pushConsentChoicesToDataLayer = (preferences: ConsentPreferences) => {
+  console.log("Log preferences",preferences);
   pushToDataLayer({
     event: 'consent_update',
     consent_status: 'customized', // Or determine based on choices
-    analytics_storage: preferences.analytics ? 'granted' : 'denied',
-    marketing_storage: preferences.marketing ? 'granted' : 'denied',
-    preferences_storage: preferences.preferences ? 'granted' : 'denied',
+    ad_storage: preferences.ad_storage ? 'granted' : 'denied',
+    ad_user_data: preferences.ad_user_data ? 'granted' : 'denied',
+    ad_personalization: preferences.ad_personalization ? 'granted' : 'denied',
+    analytics_storage: preferences.analytics_storage ? 'granted' : 'denied',
+    // marketing_storage: preferences.marketing ? 'granted' : 'denied',
+    // preferences_storage: preferences.preferences ? 'granted' : 'denied',,
     // essential_storage is always 'granted'
   });
 };
